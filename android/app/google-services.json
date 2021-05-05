@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "868667694937",
+    "project_id": "kenguroo-14a75",
+    "storage_bucket": "kenguroo-14a75.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:868667694937:android:f5c2ab061c434c0b90b648",
+        "android_client_info": {
+          "package_name": "com.example.kenguroo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "868667694937-cduq9c8u36jmarp7ktj3tqgvvlahfj09.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.kenguroo",
+            "certificate_hash": "517e6d0a2a83a53b721f1c5856d2441a52a0a6e8"
+          }
+        },
+        {
+          "client_id": "868667694937-ma1011d985cvpa2qjrut5ojf12394asm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7msn3X-LrRfKoNaj00xMWL39aIWql_70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "868667694937-ma1011d985cvpa2qjrut5ojf12394asm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
