@@ -64,8 +64,10 @@ class _AuthScreen extends State<AuthScreen> {
             ElevatedButton(
               onPressed: () => phoneNumber == null
                   ? null
-                  : Provider.of<AuthProvider>(context, listen: false)
-                      .verifyPhoneNumber(context, phoneNumber),
+                  : {
+                      Provider.of<AuthProvider>(context, listen: false)
+                          .verifyPhoneNumber(context, phoneNumber)
+                    },
               child: Text(
                 "Generate OTP",
                 style: TextStyle(color: Colors.white),

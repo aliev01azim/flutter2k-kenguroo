@@ -33,7 +33,7 @@ class CafeModel with ChangeNotifier {
     try {
       final url = Uri.parse(
           'https://kenguroo-14a75-default-rtdb.firebaseio.com/userFavorites/$userId/$id.json');
-      final response = await put(url, body: json.encode(isFavorite));
+      final response = await put(url, body: json.encode(!isFavorite));
       isFavorite = !isFavorite;
       if (response.statusCode >= 400) {
         setFavValue(favValue);
@@ -56,7 +56,6 @@ class CafeModel with ChangeNotifier {
 }
 
 class CafeCategories with ChangeNotifier {
-  final userId = FirebaseAuth.instance.currentUser.uid;
   List<CafeModel> _cafes = [];
   List<CafeModel> get cafes {
     return [..._cafes];
@@ -82,6 +81,8 @@ class CafeCategories with ChangeNotifier {
 
   Future<void> fetchAndSetCafes(BuildContext context,
       [bool filterByUser = false]) async {
+    final userId = FirebaseAuth.instance.currentUser.uid;
+
     final filterString =
         filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
     var url = Uri.parse(
@@ -131,6 +132,8 @@ class CafeCategories with ChangeNotifier {
   }
 
   Future<void> addCafe(CafeModel cafe) async {
+    final userId = FirebaseAuth.instance.currentUser.uid;
+
     final url = Uri.parse(
         "https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes.json");
     try {

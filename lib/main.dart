@@ -2,16 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
+import 'package:kenguroo/providers/location_provider.dart';
 import 'package:kenguroo/providers/search_provider.dart';
 import 'package:kenguroo/providers/auth_provider.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/favorites_screen.dart';
 import 'package:kenguroo/screens/auth_screen.dart';
 import 'package:kenguroo/screens/food_detail_screen.dart';
+import 'package:kenguroo/screens/location_screen.dart';
 import 'package:provider/provider.dart';
 
-import 'widgets/bottom_NavBar.dart';
-
-void main() {
+void main() async {
   runApp(MyApp());
 }
 
@@ -38,8 +38,11 @@ class MyApp extends StatelessWidget {
                 builder: (ctx, userSnapshot) {
                   if (userSnapshot.hasData) {
                     // return AddingCafeScreen();
+                    // return Scaffold(
+                    //   bottomNavigationBar: BottomNavBar(),
+                    // );
                     return Scaffold(
-                      bottomNavigationBar: BottomNavBar(),
+                      body: MapScreen(),
                     );
                   } else if (userSnapshot.hasError) {
                     return Text(userSnapshot.error);
@@ -48,7 +51,7 @@ class MyApp extends StatelessWidget {
                 },
               );
             }
-            return CircularProgressIndicator();
+            return Scaffold(body: CircularProgressIndicator());
           },
         ),
         routes: {
@@ -60,6 +63,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: AuthProvider()),
         ChangeNotifierProvider.value(value: CafeCategories()),
         ChangeNotifierProvider.value(value: SearchModel()),
+        ChangeNotifierProvider.value(value: LocationProvider()),
       ],
     );
   }

@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
-import 'package:kenguroo/widgets/stars.dart';
 import 'package:provider/provider.dart';
 
 class ListViewItem extends StatelessWidget {
@@ -102,14 +101,9 @@ class ListViewItem extends StatelessWidget {
               ],
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             ),
-            Consumer<CafeModel>(
-                builder: (context, value, child) => StarDisplayWidget(
-                      value: value.rating,
-                      filledStar: Icon(Icons.star),
-                      unfilledStar: Icon(
-                        Icons.star_outline,
-                      ),
-                    ))
+            SizedBox(
+              height: 10,
+            ),
           ],
         ),
       ),

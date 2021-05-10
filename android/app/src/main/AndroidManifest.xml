@@ -30,6 +30,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
@@ -37,5 +38,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data 
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBOCrHhEDs11L3mvLHb2ImuJLu81HlxKok"/>
     </application>
 </manifest>

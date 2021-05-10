@@ -78,9 +78,6 @@ class FoodDetailScreen extends StatelessWidget {
     final cafe =
         Provider.of<CafeCategories>(context, listen: false).findById(routeId);
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(loadedProduct.title),
-      // ),
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
