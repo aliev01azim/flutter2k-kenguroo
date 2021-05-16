@@ -12,6 +12,7 @@ class FavoritesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Favorites'),
+        iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.green),
       ),
       body: ListView.builder(
         itemCount: favs.length,

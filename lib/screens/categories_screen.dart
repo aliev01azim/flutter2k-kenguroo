@@ -33,20 +33,23 @@ class CategoriesScreen extends StatelessWidget {
                 : RefreshIndicator(
                     onRefresh: () => _fetchAndSet(context),
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 14, top: 20),
+                      padding: const EdgeInsets.only(left: 14, top: 0),
                       child: Consumer<CafeCategories>(
                         builder: (context, cafecategories, _) => ListView(
                           shrinkWrap: true,
                           children: [
-                            Text(
-                              'Акции и Скидки',
-                              style: Theme.of(context).textTheme.headline6,
+                            Container(
+                              margin: EdgeInsets.only(top: 20),
+                              child: Text(
+                                'Акции и Скидки',
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
                             ),
                             SizedBox(
                               height: 10,
                             ),
                             Container(
-                              height: 205,
+                              height: 225,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: cafecategories.discountCafes.length,

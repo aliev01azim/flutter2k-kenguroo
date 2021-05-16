@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/auth_provider.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/favorites_screen.dart';
+import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart';
 import 'package:provider/provider.dart';
 
 class Account extends StatelessWidget {
@@ -54,13 +55,9 @@ class Account extends StatelessWidget {
                 color: IconTheme.of(context).color,
               ),
               title: Text("Способы оплаты"),
-              // onTap: () {
-              //     print("Categories Clicked");
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(builder: (context) => CategoryScreen()),
-              //   );
-              // },
+              onTap: () {
+                Navigator.of(context).pushNamed(SposobOplaty.routeName);
+              },
             ),
             ListTile(
               trailing: Icon(
