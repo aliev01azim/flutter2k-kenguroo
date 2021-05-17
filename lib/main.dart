@@ -5,13 +5,18 @@ import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:kenguroo/providers/location_provider.dart';
 import 'package:kenguroo/providers/search_provider.dart';
 import 'package:kenguroo/providers/auth_provider.dart';
+import 'package:kenguroo/providers/user_provider.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/favorites_screen.dart';
+import 'package:kenguroo/screens/account_subScreens.dart/settings_screen.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart';
+import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
 import 'package:kenguroo/screens/auth_screen.dart';
 import 'package:kenguroo/screens/food_detail_screen.dart';
 import 'package:kenguroo/screens/location_screen.dart';
+import 'package:kenguroo/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
+import 'screens/account_subScreens.dart/about_app_screen.dart';
 import 'widgets/bottom_NavBar.dart';
 
 void main() async {
@@ -58,6 +63,8 @@ class MyApp extends StatelessWidget {
                   return AuthScreen();
                 },
               );
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return SplashScreen();
             }
             return Scaffold(body: CircularProgressIndicator());
           },
@@ -66,6 +73,9 @@ class MyApp extends StatelessWidget {
           FoodDetailScreen.routeName: (context) => FoodDetailScreen(),
           FavoritesScreen.routeName: (context) => FavoritesScreen(),
           SposobOplaty.routeName: (context) => SposobOplaty(),
+          SpravkaScreen.routeName: (context) => SpravkaScreen(),
+          AboutAppScreen.routeName: (context) => AboutAppScreen(),
+          SettingsScreen.routeName: (context) => SettingsScreen(),
         },
       ),
       providers: [
@@ -73,6 +83,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: CafeCategories()),
         ChangeNotifierProvider.value(value: SearchModel()),
         ChangeNotifierProvider.value(value: LocationProvider()),
+        ChangeNotifierProvider.value(value: UserProvider()),
       ],
     );
   }

@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/auth_provider.dart';
+import 'package:kenguroo/screens/account_subScreens.dart/about_app_screen.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/favorites_screen.dart';
+import 'package:kenguroo/screens/account_subScreens.dart/settings_screen.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart';
+import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
 import 'package:provider/provider.dart';
 
 class Account extends StatelessWidget {
@@ -65,13 +68,9 @@ class Account extends StatelessWidget {
                 color: IconTheme.of(context).color,
               ),
               title: Text("Настройки аккаунта"),
-              // onTap: () {
-              //     print("Add Clicked");
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(builder: (context) => AddItemScreen()),
-              //   );
-              // },
+              onTap: () {
+                Navigator.of(context).pushNamed(SettingsScreen.routeName);
+              },
             ),
             ListTile(
               trailing: Icon(
@@ -93,13 +92,9 @@ class Account extends StatelessWidget {
                 color: IconTheme.of(context).color,
               ),
               title: Text("Справка"),
-              // onTap: () {
-              //     print("Share Clicked");
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(builder: (context) => ShareScreen()),
-              //   );
-              // },
+              onTap: () {
+                Navigator.of(context).pushNamed(SpravkaScreen.routeName);
+              },
             ),
             ListTile(
               trailing: Icon(
@@ -107,13 +102,9 @@ class Account extends StatelessWidget {
                 color: IconTheme.of(context).color,
               ),
               title: Text("О приложении"),
-              // onTap: () {
-              //     print("Rate Clicked");
-              //   Navigator.push(
-              //     context,
-              //     MaterialPageRoute(builder: (context) => RateScreen()),
-              //   );
-              // },
+              onTap: () {
+                Navigator.of(context).pushNamed(AboutAppScreen.routeName);
+              },
             ),
             ListTile(
               title: Text(

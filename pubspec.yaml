@@ -43,6 +43,10 @@ dependencies:
   geoflutterfire: any
   google_maps_webservice: ^0.0.19
   flutter_google_places: any
+  image_picker: ^0.7.5
+  # calendar
+  flutter_cupertino_date_picker: ^1.0.26+2
+  intl: ^0.17.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -63,6 +67,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/food-placeholder.jpg
+    - assets/images/user.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
