@@ -7,6 +7,7 @@ import 'package:kenguroo/providers/search_provider.dart';
 import 'package:kenguroo/providers/auth_provider.dart';
 import 'package:kenguroo/providers/user_provider.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/favorites_screen.dart';
+import 'package:kenguroo/screens/account_subScreens.dart/partners.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/settings_screen.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget {
           SpravkaScreen.routeName: (context) => SpravkaScreen(),
           AboutAppScreen.routeName: (context) => AboutAppScreen(),
           SettingsScreen.routeName: (context) => SettingsScreen(),
+          PartnersScreen.routeName: (context) => PartnersScreen(),
         },
       ),
       providers: [

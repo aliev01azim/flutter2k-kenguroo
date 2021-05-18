@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kenguroo/models/user.dart';
 import 'package:kenguroo/providers/user_provider.dart';
-import 'package:kenguroo/widgets/radio_buttons.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -16,6 +16,9 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _isLoading = false;
+  bool isMale = false;
+  bool isFemale = false;
+  final user = firebase.FirebaseAuth.instance.currentUser;
   // calendar
   // DateTimePickerLocale _locale = DateTimePickerLocale.ru;
   // String _format = '';
@@ -29,11 +32,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // form
   var _initVals = {
     'name': '',
-    'surname': '', /*'date': ''*/
+    'surname': '',
+    /*'date': ''*/
+    'email': '',
+    'number': '',
+    'userImage': '',
   };
   var _editedUser = User(
+    id: null,
     name: '',
-    surname: '', /*date: null*/
+    surname: '',
+    /*date: null*/
+    email: '',
+    userImage: '',
   );
   final _formKey = GlobalKey<FormState>();
   final name = TextEditingController();
@@ -48,9 +59,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _isLoading = true;
     });
+
     try {
       await Provider.of<UserProvider>(context, listen: false)
-          .addUser(_editedUser);
+          .addUser(_editedUser, isMale, _image.path, user.uid);
     } catch (error) {
       await showDialog(
         context: context,
@@ -71,7 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _isLoading = false;
     });
-    // Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 
   // void _showDatePicker() {
@@ -103,14 +115,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 //  image
   File _image;
   final picker = ImagePicker();
-  bool isImage = false;
   Future getImage() async {
     final pickedFile =
         await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        isImage = true;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('No image selected'),
@@ -176,8 +186,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         onSaved: (value) {
                           _editedUser = User(
+                            id: _editedUser.id,
                             name: value,
                             surname: _editedUser.surname,
+                            email: _editedUser.email,
                           );
                         },
                       ),
@@ -192,8 +204,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         onSaved: (value) {
                           _editedUser = User(
+                            id: _editedUser.id,
                             name: _editedUser.name,
                             surname: value,
+                            email: _editedUser.email,
                           );
                         },
                       ),
@@ -219,11 +233,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     //     },
                     //   ),
                     // ),
+                    SizedBox(
+                      height: 20,
+                    ),
                     Container(
-                      child: CustomRadio(),
-                      width: double.infinity,
-                      height: 100,
-                    )
+                      padding: EdgeInsets.only(bottom: 15),
+                      decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Colors.grey.shade500, width: 1))),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                isMale = true;
+                                isFemale = false;
+                              });
+                            },
+                            splashColor: Colors.transparent,
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 15,
+                                  width: 15,
+                                  margin: EdgeInsets.only(right: 6),
+                                  decoration: BoxDecoration(
+                                    color: isMale
+                                        ? Colors.grey.shade700
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                        color: Colors.grey.shade700,
+                                        width: 1.5),
+                                  ),
+                                ),
+                                Text(
+                                  'Мужчина',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey.shade700),
+                                ),
+                              ],
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                isMale = false;
+                                isFemale = true;
+                              });
+                            },
+                            splashColor: Colors.transparent,
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 15,
+                                  width: 15,
+                                  margin: EdgeInsets.only(right: 6),
+                                  decoration: BoxDecoration(
+                                    color: isFemale
+                                        ? Colors.grey.shade700
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                        color: Colors.grey.shade700,
+                                        width: 1.5),
+                                  ),
+                                ),
+                                Text(
+                                  'Женщина',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey.shade700),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 14.0),
+                      child: TextFormField(
+                        initialValue: _initVals['email'],
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Ваш email',
+                        ),
+                        onSaved: (value) {
+                          _editedUser = User(
+                              id: _editedUser.id,
+                              name: _editedUser.name,
+                              surname: _editedUser.surname,
+                              email: value);
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 14.0),
+                      child: TextFormField(
+                        enabled: false,
+                        initialValue: user.phoneNumber,
+                        keyboardType: TextInputType.emailAddress,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Ваш телефон',
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
