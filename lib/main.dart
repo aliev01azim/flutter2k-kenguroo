@@ -44,8 +44,10 @@ class MyApp extends StatelessWidget {
           future: Firebase.initializeApp(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Center(
-                child: Text('error data'),
+              return Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
               );
             }
             if (snapshot.connectionState == ConnectionState.done) {
@@ -60,6 +62,9 @@ class MyApp extends StatelessWidget {
                     // return MapScreen();
                   } else if (userSnapshot.hasError) {
                     return Text(userSnapshot.error);
+                  } else if (userSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Scaffold(body: CircularProgressIndicator());
                   }
                   return AuthScreen();
                 },

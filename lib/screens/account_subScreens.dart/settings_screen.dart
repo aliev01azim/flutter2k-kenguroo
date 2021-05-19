@@ -15,19 +15,14 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  final user = firebase.FirebaseAuth.instance.currentUser;
   bool _isLoading = false;
   bool isMale = false;
   bool isFemale = false;
-  final user = firebase.FirebaseAuth.instance.currentUser;
   // calendar
   // DateTimePickerLocale _locale = DateTimePickerLocale.ru;
   // String _format = '';
   // DateTime _dateTime;
-  @override
-  void initState() {
-    super.initState();
-    // _dateTime = DateFormat('yyyy-MM-dd').parse('2010-05-12');
-  }
 
   // form
   var _initVals = {
@@ -39,7 +34,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     'userImage': '',
   };
   var _editedUser = User(
-    id: null,
     name: '',
     surname: '',
     /*date: null*/
@@ -47,8 +41,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     userImage: '',
   );
   final _formKey = GlobalKey<FormState>();
-  final name = TextEditingController();
-  final surname = TextEditingController();
 
   Future<void> _saveForm() async {
     final isValid = _formKey.currentState.validate();
@@ -61,8 +53,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
 
     try {
-      await Provider.of<UserProvider>(context, listen: false)
-          .addUser(_editedUser, isMale, _image.path, user.uid);
+      if (_editedUser == null) {
+        await Provider.of<UserProvider>(context, listen: false)
+            .addUser(_editedUser, isMale, _image.path, user.uid);
+      } else {
+        await Provider.of<UserProvider>(context, listen: false)
+            .updateUser(_editedUser, isMale, _image.path, user.uid);
+      }
     } catch (error) {
       await showDialog(
         context: context,
@@ -86,6 +83,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Navigator.of(context).pop();
   }
 
+  var _isInit = true;
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      getuser();
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  void getuser() async {
+    final us = await Provider.of<UserProvider>(context, listen: false)
+        .getUser(user.uid);
+    if (us != null) {
+      _editedUser = User(
+          name: us.name,
+          surname: us.surname,
+          email: us.email,
+          isMale: us.isMale,
+          userImage: us.userImage);
+      _initVals = {
+        'name': _editedUser.name,
+        'surname': _editedUser.surname,
+        /*'date': ''*/
+        'email': _editedUser.email,
+        'number': '',
+        'userImage': _editedUser.userImage,
+      };
+      if (_editedUser.isMale == true) {
+        isMale = true;
+        isFemale = false;
+      } else {
+        isMale = false;
+        isFemale = true;
+      }
+    }
+  }
   // void _showDatePicker() {
   //   DatePicker.showDatePicker(
   //     context,
@@ -115,12 +149,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
 //  image
   File _image;
   final picker = ImagePicker();
+
   Future getImage() async {
     final pickedFile =
         await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
     setState(() {
       if (pickedFile != null) {
-        _image = File(pickedFile.path);
+        if (_initVals['userImage'].isNotEmpty) {
+          _image = File(_initVals['userImage']);
+        } else {
+          _image = File(pickedFile.path);
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('No image selected'),
@@ -177,7 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       height: 15,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 14.0),
+                      padding: const EdgeInsets.only(left: 14),
                       child: TextFormField(
                         initialValue: _initVals['name'],
                         keyboardType: TextInputType.text,
@@ -186,7 +225,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         onSaved: (value) {
                           _editedUser = User(
-                            id: _editedUser.id,
                             name: value,
                             surname: _editedUser.surname,
                             email: _editedUser.email,
@@ -204,7 +242,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         onSaved: (value) {
                           _editedUser = User(
-                            id: _editedUser.id,
                             name: _editedUser.name,
                             surname: value,
                             email: _editedUser.email,
@@ -248,8 +285,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                isMale = true;
-                                isFemale = false;
+                                isMale = !isMale;
+                                isFemale = !isMale;
                               });
                             },
                             splashColor: Colors.transparent,
@@ -281,8 +318,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           InkWell(
                             onTap: () {
                               setState(() {
-                                isMale = false;
-                                isFemale = true;
+                                isMale = !isMale;
+                                isFemale = !isMale;
                               });
                             },
                             splashColor: Colors.transparent,
@@ -324,7 +361,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         onSaved: (value) {
                           _editedUser = User(
-                              id: _editedUser.id,
                               name: _editedUser.name,
                               surname: _editedUser.surname,
                               email: value);
