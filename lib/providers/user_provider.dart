@@ -19,6 +19,8 @@ class UserProvider with ChangeNotifier {
             'isMale': isMale,
             'userImage': userImage,
           }));
+      final userr = u.FirebaseAuth.instance.currentUser;
+      await userr.updateEmail(userr.email);
       notifyListeners();
     } catch (e) {
       throw e;
@@ -39,6 +41,8 @@ class UserProvider with ChangeNotifier {
             'isMale': isMale,
             'userImage': userImage,
           }));
+      final userr = u.FirebaseAuth.instance.currentUser;
+      await userr.updateEmail(user.email);
       notifyListeners();
     } catch (e) {
       throw e;
@@ -79,24 +83,21 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getUserImage(String userId) async {
-    final user = u.FirebaseAuth.instance.currentUser;
+  Future<Map<String, dynamic>> getUserImageAndEmail(u.User user) async {
     var url = Uri.parse(
-        'https://kenguroo-14a75-default-rtdb.firebaseio.com/users/$userId.json');
-    try {
-      final response = await get(url);
-      final map = json.decode(response.body) as Map<String, dynamic>;
-      if (map != null) {
-        String userImageUrl = map.values.last['userImage'];
-        await user.updateProfile(photoURL: userImageUrl);
-      } else {
-        await user.updateProfile(
-            photoURL:
-                'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg');
-      }
-      notifyListeners();
-    } catch (e) {
-      print(e);
-    }
+        'https://kenguroo-14a75-default-rtdb.firebaseio.com/users/${user.uid}.json');
+    final response = await get(url);
+    final map = json.decode(response.body) as Map<String, dynamic>;
+    url = Uri.parse(
+        'https://kenguroo-14a75-default-rtdb.firebaseio.com/usersType/${user.uid}.json');
+    final response2 = await get(url);
+    final map2 = json.decode(response2.body) as Map<String, dynamic>;
+    Map<String, dynamic> object = {
+      'userImageUrl': map['userImage'],
+      'userEmail': map['email'],
+      'isRestorator': map2['isResorator'],
+    };
+    notifyListeners();
+    return object;
   }
 }

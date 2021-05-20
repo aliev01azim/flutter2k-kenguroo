@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:provider/provider.dart';
 
 class AddingCafeScreen extends StatefulWidget {
+  static const routeName = '/adding-cafe-screen';
   @override
   _AddingCafeScreenState createState() => _AddingCafeScreenState();
 }
@@ -69,6 +73,21 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
       }
       setState(() {});
     }
+  }
+
+  File _image;
+  final picker = ImagePicker();
+
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
   }
 
   Future<void> _saveForm() async {
@@ -200,8 +219,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                                 discount: int.parse(newValue));
                           },
                         ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                        Column(
                           children: <Widget>[
                             Container(
                               width: 100,
@@ -216,54 +234,73 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                                   color: Colors.grey,
                                 ),
                               ),
-                              child: _imageUrlController.text.isEmpty
-                                  ? Text('Enter a URL')
+                              child: _imageUrlController.text.isEmpty &&
+                                      _image == null
+                                  ? Center(
+                                      child: Text(
+                                      'no image taken yet',
+                                      textAlign: TextAlign.center,
+                                    ))
                                   : FittedBox(
-                                      child: Image.network(
-                                        _imageUrlController.text,
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child: _imageUrlController.text.isNotEmpty
+                                          ? Image.network(
+                                              _imageUrlController.text,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.file(
+                                              _image,
+                                              fit: BoxFit.cover,
+                                            ),
                                     ),
                             ),
-                            Expanded(
-                              child: TextFormField(
-                                decoration:
-                                    InputDecoration(labelText: 'Image URL'),
-                                keyboardType: TextInputType.url,
-                                focusNode: _imageUrlFocus,
-                                textInputAction: TextInputAction.done,
-                                controller: _imageUrlController,
-                                onFieldSubmitted: (_) {
-                                  _saveForm();
-                                },
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Please enter an image URL.';
-                                  }
-                                  if (!value.startsWith('http') &&
-                                      !value.startsWith('https')) {
-                                    return 'Please enter a valid URL.';
-                                  }
-                                  if (!value.endsWith('.png') &&
-                                      !value.endsWith('.jpg') &&
-                                      !value.endsWith('.jpeg')) {
-                                    return 'Please enter a valid image URL.';
-                                  }
-                                  return null;
-                                },
-                                onSaved: (value) {
-                                  _editedCafe = CafeModel(
-                                    title: _editedCafe.title,
-                                    imageUrl: value,
-                                    id: _editedCafe.id,
-                                    isFavorite: _editedCafe.isFavorite,
-                                    time: _editedCafe.time,
-                                    discount: _editedCafe.discount,
-                                  );
-                                },
-                              ),
+                            TextFormField(
+                              decoration:
+                                  InputDecoration(labelText: 'Image URL'),
+                              keyboardType: TextInputType.url,
+                              focusNode: _imageUrlFocus,
+                              enabled: _image != null ? false : true,
+                              textInputAction: TextInputAction.done,
+                              controller: _imageUrlController,
+                              onFieldSubmitted: (_) {
+                                _saveForm();
+                              },
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter an image URL.';
+                                }
+                                if (!value.startsWith('http') &&
+                                    !value.startsWith('https')) {
+                                  return 'Please enter a valid URL.';
+                                }
+                                if (!value.endsWith('.png') &&
+                                    !value.endsWith('.jpg') &&
+                                    !value.endsWith('.jpeg')) {
+                                  return 'Please enter a valid image URL.';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _editedCafe = CafeModel(
+                                  title: _editedCafe.title,
+                                  imageUrl: value,
+                                  id: _editedCafe.id,
+                                  isFavorite: _editedCafe.isFavorite,
+                                  time: _editedCafe.time,
+                                  discount: _editedCafe.discount,
+                                );
+                              },
                             ),
                           ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextButton.icon(
+                          onPressed: _imageUrlController.text.isEmpty
+                              ? getImage
+                              : null,
+                          icon: Icon(Icons.camera),
+                          label: Text('Or choose from Gallery!'),
                         ),
                       ])),
             )));

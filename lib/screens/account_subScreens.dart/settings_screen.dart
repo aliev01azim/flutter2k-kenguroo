@@ -60,12 +60,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         await Provider.of<UserProvider>(context, listen: false)
             .updateUser(_editedUser, isMale, _image.path, user.uid);
       }
-    } catch (error) {
+    } on firebase.FirebaseAuthException catch (error) {
       await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: Text('An error occurred!'),
-          content: Text('Something went wrong.'),
+          content: Text(error.message),
           actions: <Widget>[
             TextButton(
               child: Text('Okay'),
@@ -87,6 +87,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void didChangeDependencies() {
     if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
       getuser();
     }
     _isInit = false;
@@ -97,12 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final us = await Provider.of<UserProvider>(context, listen: false)
         .getUser(user.uid);
     if (us != null) {
-      _editedUser = User(
-          name: us.name,
-          surname: us.surname,
-          email: us.email,
-          isMale: us.isMale,
-          userImage: us.userImage);
+      _editedUser = us;
       _initVals = {
         'name': _editedUser.name,
         'surname': _editedUser.surname,
@@ -111,7 +109,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'number': '',
         'userImage': _editedUser.userImage,
       };
-      if (_editedUser.isMale == true) {
+      if (_initVals['userImage'].length > 0) {
+        _image = File(_initVals['userImage']);
+      } else {
+        return;
+      }
+      if (_editedUser.isMale) {
         isMale = true;
         isFemale = false;
       } else {
@@ -119,6 +122,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         isFemale = true;
       }
     }
+    setState(() {
+      _isLoading = false;
+    });
+    print(File(_initVals['userImage']));
   }
   // void _showDatePicker() {
   //   DatePicker.showDatePicker(
@@ -149,17 +156,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 //  image
   File _image;
   final picker = ImagePicker();
-
   Future getImage() async {
     final pickedFile =
         await picker.getImage(source: ImageSource.gallery, imageQuality: 50);
     setState(() {
       if (pickedFile != null) {
-        if (_initVals['userImage'].isNotEmpty) {
-          _image = File(_initVals['userImage']);
-        } else {
-          _image = File(pickedFile.path);
-        }
+        _image = File(pickedFile.path);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('No image selected'),
@@ -200,7 +202,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       height: 230,
                       width: double.infinity,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          print(_image);
+                        },
                         child: Center(
                           child: IconButton(
                               icon: Icon(

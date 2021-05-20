@@ -13,8 +13,8 @@ import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart
 import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
 import 'package:kenguroo/screens/auth_screen.dart';
 import 'package:kenguroo/screens/food_detail_screen.dart';
-import 'package:kenguroo/screens/location_screen.dart';
 import 'package:kenguroo/screens/splash_screen.dart';
+import 'package:kenguroo/widgets/addingCafe.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/account_subScreens.dart/about_app_screen.dart';
@@ -55,7 +55,6 @@ class MyApp extends StatelessWidget {
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (ctx, userSnapshot) {
                   if (userSnapshot.hasData) {
-                    // return AddingCafeScreen();
                     return Scaffold(
                       bottomNavigationBar: BottomNavBar(),
                     );
@@ -83,6 +82,7 @@ class MyApp extends StatelessWidget {
           AboutAppScreen.routeName: (context) => AboutAppScreen(),
           SettingsScreen.routeName: (context) => SettingsScreen(),
           PartnersScreen.routeName: (context) => PartnersScreen(),
+          AddingCafeScreen.routeName: (context) => AddingCafeScreen(),
         },
       ),
       providers: [

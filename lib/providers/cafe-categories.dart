@@ -135,7 +135,7 @@ class CafeCategories with ChangeNotifier {
     final userId = FirebaseAuth.instance.currentUser.uid;
 
     final url = Uri.parse(
-        "https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes.json");
+        "https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId.json");
     try {
       final response = await post(url,
           body: json.encode({

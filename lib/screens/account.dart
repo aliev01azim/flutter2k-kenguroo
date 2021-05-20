@@ -10,13 +10,17 @@ import 'package:kenguroo/screens/account_subScreens.dart/partners.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/settings_screen.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
+import 'package:kenguroo/widgets/addingCafe.dart';
 import 'package:provider/provider.dart';
 
 class Account extends StatelessWidget {
   final user = FirebaseAuth.instance.currentUser;
-  Future<void> _getUserImage(BuildContext context) async {
-    await Provider.of<UserProvider>(context, listen: false)
-        .getUserImage(user.uid);
+  Map<String, dynamic> path;
+  Future<void> _getUserImageAndEmailAndUserChecking(
+      BuildContext context) async {
+    path = await Provider.of<UserProvider>(context, listen: false)
+        .getUserImageAndEmail(user);
+    print(path['isRestorator']);
   }
 
   @override
@@ -30,14 +34,14 @@ class Account extends StatelessWidget {
         ),
       ),
       body: FutureBuilder(
-        future: _getUserImage(context),
+        future: _getUserImageAndEmailAndUserChecking(context),
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
             ? Center(
                 child: CircularProgressIndicator(),
               )
             : RefreshIndicator(
-                onRefresh: () => _getUserImage(context),
+                onRefresh: () => _getUserImageAndEmailAndUserChecking(context),
                 child: SingleChildScrollView(
                   physics:
                       ScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
@@ -52,7 +56,8 @@ class Account extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           child: CircleAvatar(
-                            foregroundImage: FileImage(File(user.photoURL)),
+                            foregroundImage:
+                                FileImage(File(path['userImageUrl'])),
                             backgroundColor: Colors.grey[500],
                             child: Icon(
                               Icons.account_circle_outlined,
@@ -61,8 +66,20 @@ class Account extends StatelessWidget {
                           ),
                         ),
                         title: Text(user.phoneNumber),
-                        subtitle: Text('asdasd@mail'),
+                        subtitle: Text(path['userEmail']),
                       ),
+                      if (path['isRestorator'])
+                        ListTile(
+                          trailing: Icon(
+                            Icons.restaurant,
+                            color: IconTheme.of(context).color,
+                          ),
+                          title: Text("Добавить ресторан"),
+                          onTap: () {
+                            Navigator.of(context)
+                                .pushNamed(AddingCafeScreen.routeName);
+                          },
+                        ),
                       ListTile(
                         trailing: Icon(
                           Icons.favorite_border,
