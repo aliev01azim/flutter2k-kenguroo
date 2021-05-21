@@ -10,7 +10,7 @@ import 'package:kenguroo/screens/account_subScreens.dart/partners.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/settings_screen.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
-import 'package:kenguroo/widgets/addingCafe.dart';
+import 'package:kenguroo/screens/addingCafe.dart';
 import 'package:provider/provider.dart';
 
 class Account extends StatelessWidget {
@@ -20,7 +20,6 @@ class Account extends StatelessWidget {
       BuildContext context) async {
     path = await Provider.of<UserProvider>(context, listen: false)
         .getUserImageAndEmail(user);
-    print(path['isRestorator']);
   }
 
   @override

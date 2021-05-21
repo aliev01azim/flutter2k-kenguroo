@@ -83,6 +83,20 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> getUsersType(String userId) async {
+    var url = Uri.parse(
+        'https://kenguroo-14a75-default-rtdb.firebaseio.com/usersType/$userId.json');
+    final response = await get(url);
+    final map = json.decode(response.body) as Map<String, dynamic>;
+    Map<String, dynamic> object = {
+      'isCourier': map['isCourier'],
+      'isResorator': map['isResorator'],
+      'justUser': map['justUser'],
+    };
+    notifyListeners();
+    return object;
+  }
+
   Future<Map<String, dynamic>> getUserImageAndEmail(u.User user) async {
     var url = Uri.parse(
         'https://kenguroo-14a75-default-rtdb.firebaseio.com/users/${user.uid}.json');

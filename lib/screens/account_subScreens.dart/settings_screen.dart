@@ -70,7 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton(
               child: Text('Okay'),
               onPressed: () {
-                Navigator.of(ctx).pop();
+                Navigator.of(ctx).pop(true);
               },
             )
           ],

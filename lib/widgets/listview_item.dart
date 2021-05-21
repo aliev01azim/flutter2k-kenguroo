@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
-import 'package:kenguroo/screens/food_detail_screen.dart';
+import 'package:kenguroo/screens/cafe_detail_screen.dart';
 import 'package:provider/provider.dart';
 
 class ListViewItem extends StatelessWidget {
@@ -15,7 +15,7 @@ class ListViewItem extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.of(context)
-            .pushNamed(FoodDetailScreen.routeName, arguments: cafe.id);
+            .pushNamed(CafeDetailScreen.routeName, arguments: cafe.id);
       },
       child: Container(
         padding: EdgeInsets.only(right: 5),

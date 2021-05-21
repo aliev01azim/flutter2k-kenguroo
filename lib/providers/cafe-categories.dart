@@ -15,7 +15,7 @@ class CafeModel with ChangeNotifier {
   double rating;
   bool isFavorite;
   CafeModel({
-    @required this.id,
+    this.id,
     @required this.time,
     @required this.title,
     @required this.imageUrl,
@@ -65,10 +65,6 @@ class CafeCategories with ChangeNotifier {
     return _cafes.where((element) => element.isFavorite).toList();
   }
 
-  List<CafeModel> get discountCafes {
-    return _cafes.where((element) => element.discount >= 1).toList();
-  }
-
   List<CafeModel> get popularCafes {
     return _cafes.where((element) => element.rating >= 4).toList();
   }
@@ -77,7 +73,13 @@ class CafeCategories with ChangeNotifier {
     return _cafes.where((element) => element.time <= 30).toList();
   }
 
-  double get rating {}
+  List<CafeModel> get discountCafes {
+    return _cafes.where((element) => element.discount >= 1).toList();
+  }
+
+  CafeModel get lastCafe {
+    return _cafes.last;
+  }
 
   Future<void> fetchAndSetCafes(BuildContext context,
       [bool filterByUser = false]) async {
@@ -103,19 +105,25 @@ class CafeCategories with ChangeNotifier {
       final favoriteData = json.decode(favoriteResponse.body);
 
       final List<CafeModel> loadedProducts = [];
-      extractedData.forEach((prodId, prodData) {
-        loadedProducts.add(CafeModel(
-            id: prodId,
-            time: prodData['time'],
-            // rating:
-            //     mostRatedData == null ? false : mostRatedData[prodId] ?? false,
-            title: prodData['title'],
-            isFavorite:
-                favoriteData == null ? false : favoriteData[prodId] ?? false,
-            imageUrl: prodData['imageUrl'],
-            discount: prodData['discount']));
+      extractedData.forEach((key, value) {
+        value.forEach((prodId, prodData) {
+          print('sadadasdasdasdasdasdsad');
+          print(prodId);
+          loadedProducts.add(CafeModel(
+              id: prodId,
+              time: prodData['time'],
+              // rating:
+              //     mostRatedData == null ? false : mostRatedData[prodId] ?? false,
+              title: prodData['title'],
+              isFavorite:
+                  favoriteData == null ? false : favoriteData[prodId] ?? false,
+              imageUrl: prodData['imageUrl'],
+              discount: prodData['discount']));
+        });
       });
+
       _cafes = loadedProducts;
+      print(_cafes[0].title);
       notifyListeners();
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
@@ -160,11 +168,12 @@ class CafeCategories with ChangeNotifier {
   }
 
   Future<void> updateCafe(String id, CafeModel newCafe) async {
+    final userId = FirebaseAuth.instance.currentUser.uid;
     final cafeindex = _cafes.indexWhere((element) => element.id == id);
     if (cafeindex >= 0) {
       try {
         final url = Uri.parse(
-            'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$id.json');
+            'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId/$id.json');
         await patch(url,
             body: json.encode({
               'title': newCafe.title,
@@ -182,10 +191,11 @@ class CafeCategories with ChangeNotifier {
   }
 
   Future<void> deleteCafe(String id) async {
+    final userId = FirebaseAuth.instance.currentUser.uid;
     try {
       final existingCafe = _cafes.firstWhere((element) => element.id == id);
       final url = Uri.parse(
-          'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$id.json');
+          'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId/$id.json');
       _cafes.remove(existingCafe);
       notifyListeners();
       await delete(url);

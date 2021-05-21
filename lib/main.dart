@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:kenguroo/providers/food_categories.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:kenguroo/providers/location_provider.dart';
 import 'package:kenguroo/providers/search_provider.dart';
@@ -12,12 +13,13 @@ import 'package:kenguroo/screens/account_subScreens.dart/settings_screen.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart';
 import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
 import 'package:kenguroo/screens/auth_screen.dart';
-import 'package:kenguroo/screens/food_detail_screen.dart';
+import 'package:kenguroo/screens/cafe_detail_screen.dart';
 import 'package:kenguroo/screens/splash_screen.dart';
-import 'package:kenguroo/widgets/addingCafe.dart';
+import 'package:kenguroo/screens/addingCafe.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/account_subScreens.dart/about_app_screen.dart';
+import 'screens/addingFood.dart';
 import 'widgets/bottom_NavBar.dart';
 
 void main() async {
@@ -75,7 +77,7 @@ class MyApp extends StatelessWidget {
           },
         ),
         routes: {
-          FoodDetailScreen.routeName: (context) => FoodDetailScreen(),
+          CafeDetailScreen.routeName: (context) => CafeDetailScreen(),
           FavoritesScreen.routeName: (context) => FavoritesScreen(),
           SposobOplaty.routeName: (context) => SposobOplaty(),
           SpravkaScreen.routeName: (context) => SpravkaScreen(),
@@ -83,6 +85,7 @@ class MyApp extends StatelessWidget {
           SettingsScreen.routeName: (context) => SettingsScreen(),
           PartnersScreen.routeName: (context) => PartnersScreen(),
           AddingCafeScreen.routeName: (context) => AddingCafeScreen(),
+          AddingFoodScreen.routeName: (context) => AddingFoodScreen(),
         },
       ),
       providers: [
@@ -91,6 +94,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: SearchModel()),
         ChangeNotifierProvider.value(value: LocationProvider()),
         ChangeNotifierProvider.value(value: UserProvider()),
+        ChangeNotifierProvider.value(value: FoodCategories()),
       ],
     );
   }

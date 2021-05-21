@@ -8,7 +8,7 @@ import 'package:kenguroo/providers/search_provider.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
-import 'food_detail_screen.dart';
+import 'cafe_detail_screen.dart';
 
 class LookScreen extends StatefulWidget {
   const LookScreen({Key key}) : super(key: key);
@@ -142,7 +142,7 @@ class _LookScreenState extends State<LookScreen> {
                   place.foods == word ? word : null,
                   place.restourants == word ? word : null
                 };
-                Navigator.pushNamed(context, FoodDetailScreen.routeName,
+                Navigator.pushNamed(context, CafeDetailScreen.routeName,
                     arguments: arguments2);
               } /*=> model.clear()*/,
             );

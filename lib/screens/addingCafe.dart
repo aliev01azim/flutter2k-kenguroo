@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
+import 'package:kenguroo/screens/addingFood.dart';
 import 'package:provider/provider.dart';
 
 class AddingCafeScreen extends StatefulWidget {
@@ -24,8 +25,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
     'discount': '',
     'imageUrl': '',
   };
-  var _editedCafe =
-      CafeModel(id: null, time: 0, title: '', imageUrl: '', discount: 0);
+  var _editedCafe = CafeModel(time: 0, title: '', imageUrl: '', discount: 0);
   var _isInit = true;
   var _isLoading = false;
   @override
@@ -127,7 +127,11 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
     setState(() {
       _isLoading = false;
     });
-    // Navigator.of(context).pop();
+    final cafeid =
+        Provider.of<CafeCategories>(context, listen: false).lastCafe.id;
+    Navigator.of(context)
+        .pushReplacementNamed(AddingFoodScreen.routeName, arguments: cafeid);
+    print('adding Cafe Screen $cafeid');
   }
 
   @override
@@ -138,13 +142,15 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
           'Зaполните форму',
           style: TextStyle(color: Colors.black),
         )),
-        body: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
-            child: SingleChildScrollView(
-              child: Form(
-                  key: _formKey,
-                  child: Column(
+        body: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 16.0, horizontal: 16.0),
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         TextFormField(
@@ -302,7 +308,16 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                           icon: Icon(Icons.camera),
                           label: Text('Or choose from Gallery!'),
                         ),
-                      ])),
-            )));
+                        SizedBox(
+                          height: 20,
+                        ),
+                        ElevatedButton(
+                          onPressed: _saveForm,
+                          child: Text('Submit!'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )));
   }
 }

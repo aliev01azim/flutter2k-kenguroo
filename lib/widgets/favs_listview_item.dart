@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
-import 'package:kenguroo/screens/food_detail_screen.dart';
+import 'package:kenguroo/screens/cafe_detail_screen.dart';
 
 class FavListViewItem extends StatelessWidget {
   final CafeModel cafe;
@@ -12,7 +12,7 @@ class FavListViewItem extends StatelessWidget {
       subtitle: Text(cafe.time.toString()),
       onTap: () {
         Navigator.of(context)
-            .pushNamed(FoodDetailScreen.routeName, arguments: cafe.id);
+            .pushNamed(CafeDetailScreen.routeName, arguments: cafe.id);
       },
     );
   }
