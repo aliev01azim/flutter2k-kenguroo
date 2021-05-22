@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kenguroo/providers/cart.dart';
 import 'package:kenguroo/screens/account.dart';
 import 'package:kenguroo/screens/cart_screen.dart';
 import 'package:kenguroo/screens/categories_screen.dart';
 import 'package:kenguroo/screens/look_screen.dart' as LookScreen;
+import 'package:provider/provider.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -54,8 +56,39 @@ class _BottomNavBarState extends State<BottomNavBar> {
             label: 'look',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.shopping_cart,
+            icon: Stack(
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              alignment: Alignment.center,
+              children: [
+                Icon(Icons.shopping_cart),
+                Positioned(
+                  left: 12,
+                  bottom: 12,
+                  child: Container(
+                    padding: EdgeInsets.all(1.0),
+                    // color: Theme.of(context).accentColor,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.red,
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 13,
+                      minHeight: 13,
+                    ),
+                    child: Consumer<Cart>(
+                      builder: (context, value, _) => Text(
+                        value.itemCount.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 7,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
             label: 'cart',
           ),

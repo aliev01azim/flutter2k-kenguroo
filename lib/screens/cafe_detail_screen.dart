@@ -1,11 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:kenguroo/providers/food_categories.dart';
 import 'package:kenguroo/widgets/FoodsGridViewItem.dart';
 import 'package:provider/provider.dart';
 
-class CafeDetailScreen extends StatelessWidget {
-  Future<void> _fetchFoods(BuildContext context) async {
+class CafeDetailScreen extends StatefulWidget {
+  static const routeName = '/cafe-detail-screen';
+
+  @override
+  _CafeDetailScreenState createState() => _CafeDetailScreenState();
+}
+
+class _CafeDetailScreenState extends State<CafeDetailScreen> {
+  bool isLoading = true;
+  @override
+  void didChangeDependencies() {
+    _fetchFoods(context);
+    Future.delayed(Duration(milliseconds: 480), () {
+      isLoading = false;
+    });
+    super.didChangeDependencies();
+  }
+
+  void _fetchFoods(BuildContext context) async {
     final routeId = ModalRoute.of(context).settings.arguments as String;
     final cafe =
         Provider.of<CafeCategories>(context, listen: false).findById(routeId);
@@ -81,151 +100,147 @@ class CafeDetailScreen extends StatelessWidget {
     );
   }
 
-  static const routeName = '/cafe-detail-screen';
   @override
   Widget build(BuildContext context) {
     final routeId = ModalRoute.of(context).settings.arguments as String;
-    final cafe = Provider.of<CafeCategories>(context).findById(routeId);
-    final foods = Provider.of<FoodCategories>(context, listen: false).foods;
+    final cafe =
+        Provider.of<CafeCategories>(context, listen: false).findById(routeId);
+    final foods = Provider.of<FoodCategories>(context).foods;
     return Scaffold(
-      body: FutureBuilder(
-        future: _fetchFoods(context),
-        builder: (context, snapshot) => snapshot.connectionState ==
-                ConnectionState.waiting
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : CustomScrollView(
-                slivers: <Widget>[
-                  SliverAppBar(
-                    expandedHeight: 200,
-                    pinned: true,
-                    titleTextStyle: TextStyle(),
-                    title: Text(
-                      cafe.title,
-                    ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Hero(
-                        tag: cafe.id,
-                        child: Image.network(
-                          cafe.imageUrl,
-                          fit: BoxFit.cover,
-                        ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : CustomScrollView(
+              slivers: <Widget>[
+                SliverAppBar(
+                  expandedHeight: 200,
+                  pinned: true,
+                  titleTextStyle: TextStyle(),
+                  title: Text(
+                    cafe.title,
+                  ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Hero(
+                      tag: cafe.id,
+                      child: Image.network(
+                        cafe.imageUrl,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                  SliverList(
-                    delegate: SliverChildListDelegate(
-                      [
-                        SizedBox(height: 10),
-                        Text(
-                          cafe.title,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate(
+                    [
+                      SizedBox(height: 10),
+                      Text(
+                        cafe.title,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star,
+                                color: Colors.brown,
+                              ),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Text(
+                                cafe.rating.toString(),
+                                style: TextStyle(color: Colors.brown),
+                              ),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Row(
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  color: Colors.brown,
-                                ),
-                                SizedBox(
-                                  width: 3,
-                                ),
-                                Text(
-                                  cafe.rating.toString(),
-                                  style: TextStyle(color: Colors.brown),
-                                ),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Icon(Icons.directions_run_rounded),
-                                SizedBox(
-                                  width: 3,
-                                ),
-                                Text('${cafe.time} мин.'),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.sports_hockey,
-                                  color: Colors.green,
-                                ),
-                                SizedBox(
-                                  width: 3,
-                                ),
-                                Text(
-                                  '${cafe.discount}%',
-                                  style: TextStyle(color: Colors.green),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        ),
-                        Row(
-                          children: [
-                            TextButton.icon(
-                                style: ButtonStyle(
-                                    foregroundColor: MaterialStateProperty.all(
-                                        Colors.black87)),
-                                onPressed: () => _showModal(context),
-                                icon: Icon(Icons.ad_units_rounded),
-                                label: Text('О ресторане')),
-                            TextButton.icon(
-                                style: ButtonStyle(
-                                    foregroundColor: MaterialStateProperty.all(
-                                        Colors.black87)),
-                                onPressed: () => _showModal2(context),
-                                icon: Icon(Icons.directions_run_rounded),
-                                label: Text('Доставка 99с-149с'))
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          'Foods',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                      ],
-                    ),
+                          Row(
+                            children: [
+                              Icon(Icons.directions_run_rounded),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Text('${cafe.time} мин.'),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.sports_hockey,
+                                color: Colors.green,
+                              ),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Text(
+                                '${cafe.discount}%',
+                                style: TextStyle(color: Colors.green),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      ),
+                      Row(
+                        children: [
+                          TextButton.icon(
+                              style: ButtonStyle(
+                                  foregroundColor: MaterialStateProperty.all(
+                                      Colors.black87)),
+                              onPressed: () => _showModal(context),
+                              icon: Icon(Icons.ad_units_rounded),
+                              label: Text('О ресторане')),
+                          TextButton.icon(
+                              style: ButtonStyle(
+                                  foregroundColor: MaterialStateProperty.all(
+                                      Colors.black87)),
+                              onPressed: () => _showModal2(context),
+                              icon: Icon(Icons.directions_run_rounded),
+                              label: Text('Доставка 99с-149с'))
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Foods',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                    ],
                   ),
-                  SliverGrid(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 3 / 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => ChangeNotifierProvider.value(
-                          value: foods[index],
-                          child: FoodsGridViewItem(foods[index])),
-                      childCount: foods.length,
-                    ),
-                  )
-                ],
-              ),
-      ),
+                ),
+                SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 3 / 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10),
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => ChangeNotifierProvider.value(
+                        value: foods[index],
+                        child: FoodsGridViewItem(foods[index])),
+                    childCount: foods.length,
+                  ),
+                )
+              ],
+            ),
     );
   }
 }

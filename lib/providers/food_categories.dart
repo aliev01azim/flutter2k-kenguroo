@@ -8,17 +8,19 @@ import 'package:http/http.dart';
 class FoodModel with ChangeNotifier {
   String cafeId;
   String id;
+  int quantity;
   String title;
   String imageUrl;
   String time; /*description*/
-  int discount; /*count*/
+  int discount; /*price*/
   bool isFavorite;
   FoodModel({
     this.cafeId,
+    this.quantity = 1,
     @required this.id,
-    @required this.time,
+    this.time,
     @required this.title,
-    @required this.imageUrl,
+    this.imageUrl,
     @required this.discount,
     this.isFavorite = false,
   });
@@ -72,10 +74,10 @@ class FoodCategories with ChangeNotifier {
       //     'https://kenguroo-14a75-default-rtdb.firebaseio.com/mostRated.json');
       // final mostRatedResponse = await get(url);
       // final mostRatedData = json.decode(mostRatedResponse.body);
-      // url = Uri.parse(
-      //     'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId/foodFavorites.json');
-      // final favoriteResponse = await get(url);
-      // final favoriteData = json.decode(favoriteResponse.body);
+      url = Uri.parse(
+          'https://kenguroo-14a75-default-rtdb.firebaseio.com/foodFavorites/$userId.json');
+      final favoriteResponse = await get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
 
       final List<FoodModel> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
@@ -85,8 +87,8 @@ class FoodCategories with ChangeNotifier {
             // rating:
             //     mostRatedData == null ? false : mostRatedData[prodId] ?? false,
             title: prodData['title'],
-            // isFavorite:
-            //     favoriteData == null ? false : favoriteData[prodId] ?? false,
+            isFavorite:
+                favoriteData == null ? false : favoriteData[prodId] ?? false,
             imageUrl: prodData['imageUrl'],
             discount: prodData['discount']));
       });
@@ -151,8 +153,6 @@ class FoodCategories with ChangeNotifier {
       } catch (e) {
         throw e;
       }
-    } else {
-      print('....');
     }
   }
 

@@ -107,8 +107,6 @@ class CafeCategories with ChangeNotifier {
       final List<CafeModel> loadedProducts = [];
       extractedData.forEach((key, value) {
         value.forEach((prodId, prodData) {
-          print('sadadasdasdasdasdasdsad');
-          print(prodId);
           loadedProducts.add(CafeModel(
               id: prodId,
               time: prodData['time'],

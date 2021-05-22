@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:kenguroo/providers/cart.dart';
 import 'package:kenguroo/providers/food_categories.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:kenguroo/providers/location_provider.dart';
@@ -95,6 +96,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: LocationProvider()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: FoodCategories()),
+        ChangeNotifierProvider.value(
+          value: Cart(),
+        )
       ],
     );
   }
