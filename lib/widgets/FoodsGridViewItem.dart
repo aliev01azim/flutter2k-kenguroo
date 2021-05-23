@@ -8,8 +8,13 @@ import 'package:provider/provider.dart';
 
 class FoodsGridViewItem extends StatelessWidget {
   final userId = FirebaseAuth.instance.currentUser.uid;
+  final String cafeTitle;
+  final String cafeId;
   final FoodModel food;
-  FoodsGridViewItem(this.food);
+  final int cafeDostavkaTime;
+  final int cafeSkidka;
+  FoodsGridViewItem(this.food, this.cafeId, this.cafeTitle,
+      this.cafeDostavkaTime, this.cafeSkidka);
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -17,7 +22,8 @@ class FoodsGridViewItem extends StatelessWidget {
       child: GridTile(
         child: GestureDetector(
           onTap: () {
-            _modalBottomSheetMenu(context, food);
+            _modalBottomSheetMenu(
+                context, food, cafeId, cafeTitle, cafeDostavkaTime, cafeSkidka);
           },
           child: FadeInImage(
             placeholder: AssetImage('assets/images/food-placeholder.jpg'),
@@ -49,7 +55,8 @@ class FoodsGridViewItem extends StatelessWidget {
               Icons.shopping_cart,
             ),
             onPressed: () {
-              _modalBottomSheetMenu(context, food);
+              _modalBottomSheetMenu(context, food, cafeId, cafeTitle,
+                  cafeDostavkaTime, cafeSkidka);
             },
             color: Theme.of(context).accentColor,
           ),
@@ -59,142 +66,163 @@ class FoodsGridViewItem extends StatelessWidget {
   }
 }
 
-void _modalBottomSheetMenu(BuildContext context, FoodModel food) {
+void _modalBottomSheetMenu(BuildContext context, FoodModel food, String cafeId,
+    String cafeTitle, int cafeDostavkaTime, int cafeSkidka) {
+  int _quantity = 0;
   final cart = Provider.of<Cart>(context, listen: false);
   showModalBottomSheet(
       context: context,
       clipBehavior: Clip.antiAlias,
       builder: (builder) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: 20),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: const Radius.circular(10.0),
-                        topRight: const Radius.circular(10.0)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 220,
-                          child: Image(
-                            image: food.imageUrl.startsWith('http')
-                                ? NetworkImage(food.imageUrl)
-                                : FileImage(File(food.imageUrl)),
-                            fit: BoxFit.cover,
+        return StatefulBuilder(
+          builder: (context, setState) => SingleChildScrollView(
+            padding: EdgeInsets.only(bottom: 20),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: const Radius.circular(10.0),
+                          topRight: const Radius.circular(10.0)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(
+                        children: [
+                          Container(
+                            height: 220,
+                            child: Image(
+                              image: food.imageUrl.startsWith('http')
+                                  ? NetworkImage(food.imageUrl)
+                                  : FileImage(File(food.imageUrl)),
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 14,
-                        ),
-                        Row(
-                          children: [
-                            Text(food.title,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                )),
-                            Consumer<Cart>(
-                                builder: (_, value, __) => Text(
-                                      value.totalAmount.toString(),
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(color: Colors.grey[400]),
-                                    )),
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        ),
-                        SizedBox(
-                          height: 14,
-                        ),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            food.time,
-                            textAlign: TextAlign.start,
-                            softWrap: true,
-                            maxLines: 5,
-                            style: TextStyle(color: Colors.grey),
+                          SizedBox(
+                            height: 14,
                           ),
-                        ),
-                        SizedBox(
-                          height: 14,
-                        ),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Row(
                             children: [
-                              Container(
-                                width: 130,
-                                child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          cart.removeSingleItem(food.id);
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.only(right: 8),
-                                          height: 45,
-                                          width: 45,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(45),
-                                              color: Colors.grey.shade200),
-                                          child: Center(
-                                            child: Text(
-                                              '-',
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Consumer<Cart>(
-                                          builder: (_, value, __) =>
-                                              Text(value.quantity.toString())),
-                                      InkWell(
-                                        onTap: () {
-                                          cart.addItem(food.id, food.discount,
-                                              food.title);
-                                        },
-                                        child: Container(
-                                          margin: EdgeInsets.only(left: 8),
-                                          height: 45,
-                                          width: 45,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(45),
-                                              color: Colors.grey.shade200),
-                                          child: Center(
-                                            child: Text(
-                                              '+',
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ]),
+                              Text(food.title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              Text(
+                                '${_quantity * food.discount}',
+                                textAlign: TextAlign.start,
+                                style: TextStyle(color: Colors.grey[400]),
                               ),
-                              ElevatedButton(
-                                onPressed: () {},
-                                child: Text('Добавить'),
-                                style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all(Colors.green),
-                                    padding: MaterialStateProperty.all(
-                                        EdgeInsets.symmetric(horizontal: 25))),
-                              )
-                            ]),
-                      ],
+                            ],
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          ),
+                          SizedBox(
+                            height: 14,
+                          ),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              food.time,
+                              textAlign: TextAlign.start,
+                              softWrap: true,
+                              maxLines: 5,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 14,
+                          ),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width: 130,
+                                  child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _quantity--;
+                                            });
+                                          },
+                                          child: Container(
+                                            margin: EdgeInsets.only(right: 8),
+                                            height: 45,
+                                            width: 45,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(45),
+                                                color: Colors.grey.shade200),
+                                            child: Center(
+                                              child: Text(
+                                                '-',
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Text(_quantity.toString()),
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _quantity++;
+                                            });
+                                          },
+                                          child: Container(
+                                            margin: EdgeInsets.only(left: 8),
+                                            height: 45,
+                                            width: 45,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(45),
+                                                color: Colors.grey.shade200),
+                                            child: Center(
+                                              child: Text(
+                                                '+',
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ]),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    cart.addItem(
+                                        food.id,
+                                        food.discount,
+                                        food.title,
+                                        food.imageUrl,
+                                        _quantity,
+                                        cafeId,
+                                        cafeTitle,
+                                        cafeDostavkaTime,
+                                        cafeSkidka);
+                                    setState(() {
+                                      _quantity = 0;
+                                    });
+                                  },
+                                  child: Text('Добавить'),
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.green),
+                                      padding: MaterialStateProperty.all(
+                                          EdgeInsets.symmetric(
+                                              horizontal: 25))),
+                                )
+                              ]),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ]),
+                ]),
+          ),
         );
       });
 }

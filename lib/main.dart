@@ -58,15 +58,13 @@ class MyApp extends StatelessWidget {
                 stream: FirebaseAuth.instance.authStateChanges(),
                 builder: (ctx, userSnapshot) {
                   if (userSnapshot.hasData) {
-                    return Scaffold(
-                      bottomNavigationBar: BottomNavBar(),
-                    );
+                    return BottomNavBar();
                     // return MapScreen();
                   } else if (userSnapshot.hasError) {
                     return Text(userSnapshot.error);
                   } else if (userSnapshot.connectionState ==
                       ConnectionState.waiting) {
-                    return Scaffold(body: CircularProgressIndicator());
+                    return SplashScreen();
                   }
                   return AuthScreen();
                 },
@@ -74,7 +72,7 @@ class MyApp extends StatelessWidget {
             } else if (snapshot.connectionState == ConnectionState.waiting) {
               return SplashScreen();
             }
-            return Scaffold(body: CircularProgressIndicator());
+            return SplashScreen();
           },
         ),
         routes: {

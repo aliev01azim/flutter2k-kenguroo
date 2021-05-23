@@ -7,6 +7,7 @@ import 'package:http/http.dart';
 
 class FoodModel with ChangeNotifier {
   String cafeId;
+  String cafeTitle;
   String id;
   int quantity;
   String title;
@@ -14,9 +15,14 @@ class FoodModel with ChangeNotifier {
   String time; /*description*/
   int discount; /*price*/
   bool isFavorite;
+  int cafeDostavkaTime;
+  int cafeSkidka;
   FoodModel({
     this.cafeId,
-    this.quantity = 1,
+    this.cafeDostavkaTime,
+    this.cafeSkidka,
+    this.quantity,
+    this.cafeTitle,
     @required this.id,
     this.time,
     @required this.title,

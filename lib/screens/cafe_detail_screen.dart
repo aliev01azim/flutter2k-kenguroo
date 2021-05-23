@@ -235,7 +235,8 @@ class _CafeDetailScreenState extends State<CafeDetailScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) => ChangeNotifierProvider.value(
                         value: foods[index],
-                        child: FoodsGridViewItem(foods[index])),
+                        child: FoodsGridViewItem(foods[index], cafe.id,
+                            cafe.title, cafe.time, cafe.discount)),
                     childCount: foods.length,
                   ),
                 )

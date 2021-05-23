@@ -5,7 +5,10 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: CircularProgressIndicator(),
+        child: FlutterLogo(
+          duration: Duration(seconds: 1),
+          size: 120,
+        ),
       ),
     );
   }

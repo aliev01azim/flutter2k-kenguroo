@@ -13,11 +13,6 @@ class Cart with ChangeNotifier {
     return _items.length;
   }
 
-  int _quantity = 0;
-  int get quantity {
-    return _quantity;
-  }
-
   double get totalAmount {
     var total = 0.0;
     _items.forEach((key, cartItem) {
@@ -27,30 +22,44 @@ class Cart with ChangeNotifier {
   }
 
   void addItem(
-    String productId,
+    String foodId,
     int price,
     String title,
+    String imageUrl,
+    int quantity,
+    String cafeId,
+    String cafeTitle,
+    int cafeDostavkaTime,
+    int cafeSkidka,
   ) {
-    if (_items.containsKey(productId)) {
-      _quantity = _quantity + 1;
+    if (_items.containsKey(foodId)) {
       _items.update(
-        productId,
+        foodId,
         (existingCartItem) => FoodModel(
           id: existingCartItem.id,
           title: existingCartItem.title,
+          cafeTitle: existingCartItem.cafeTitle,
           discount: existingCartItem.discount,
-          quantity: existingCartItem.quantity + 1,
+          imageUrl: existingCartItem.imageUrl,
+          cafeId: existingCartItem.cafeId,
+          cafeDostavkaTime: existingCartItem.cafeDostavkaTime,
+          cafeSkidka: existingCartItem.cafeSkidka,
+          quantity: quantity,
         ),
       );
     } else {
-      _quantity = 1;
       _items.putIfAbsent(
-        productId,
+        foodId,
         () => FoodModel(
-          id: DateTime.now().toString(),
+          id: foodId,
           title: title,
           discount: price,
-          quantity: 1,
+          imageUrl: imageUrl,
+          cafeId: cafeId,
+          cafeTitle: cafeTitle,
+          quantity: quantity,
+          cafeDostavkaTime: cafeDostavkaTime,
+          cafeSkidka: cafeSkidka,
         ),
       );
     }
@@ -66,18 +75,21 @@ class Cart with ChangeNotifier {
     if (!_items.containsKey(productId)) {
       return;
     }
-    if (_items[productId].quantity > 1) {
-      _quantity = _quantity - 1;
+    if (_items[productId].quantity > 0) {
       _items.update(
           productId,
           (existingCartItem) => FoodModel(
                 id: existingCartItem.id,
                 title: existingCartItem.title,
                 discount: existingCartItem.discount,
-                quantity: existingCartItem.quantity - 1,
+                cafeId: existingCartItem.cafeId,
+                cafeTitle: existingCartItem.cafeTitle,
+                imageUrl: existingCartItem.imageUrl,
+                cafeDostavkaTime: existingCartItem.cafeDostavkaTime,
+                cafeSkidka: existingCartItem.cafeSkidka,
+                quantity: existingCartItem.quantity,
               ));
     } else {
-      _quantity = 0;
       _items.remove(productId);
     }
     notifyListeners();
