@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/cart.dart';
 import 'package:kenguroo/providers/food_categories.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
+import 'package:kenguroo/providers/kuhni_provider.dart';
 import 'package:kenguroo/providers/location_provider.dart';
 import 'package:kenguroo/providers/search_provider.dart';
 import 'package:kenguroo/providers/auth_provider.dart';
@@ -15,6 +16,7 @@ import 'package:kenguroo/screens/account_subScreens.dart/sposobOplaty_scree.dart
 import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
 import 'package:kenguroo/screens/auth_screen.dart';
 import 'package:kenguroo/screens/cafe_detail_screen.dart';
+import 'package:kenguroo/screens/kuhnya_category_screen.dart';
 import 'package:kenguroo/screens/splash_screen.dart';
 import 'package:kenguroo/screens/addingCafe.dart';
 import 'package:provider/provider.dart';
@@ -85,6 +87,7 @@ class MyApp extends StatelessWidget {
           PartnersScreen.routeName: (context) => PartnersScreen(),
           AddingCafeScreen.routeName: (context) => AddingCafeScreen(),
           AddingFoodScreen.routeName: (context) => AddingFoodScreen(),
+          KuhnyaCategoryScreen.routeName: (context) => KuhnyaCategoryScreen(),
         },
       ),
       providers: [
@@ -94,9 +97,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: LocationProvider()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: FoodCategories()),
-        ChangeNotifierProvider.value(
-          value: Cart(),
-        )
+        ChangeNotifierProvider.value(value: KuhniProvider()),
+        ChangeNotifierProvider.value(value: Cart())
       ],
     );
   }

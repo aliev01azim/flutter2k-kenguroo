@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:kenguroo/screens/addingFood.dart';
+import 'package:kenguroo/widgets/kuhni.dart';
+import 'package:kenguroo/widgets/kuhni_listtile.dart';
 import 'package:provider/provider.dart';
 
 class AddingCafeScreen extends StatefulWidget {
@@ -105,7 +107,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
     } else {
       try {
         await Provider.of<CafeCategories>(context, listen: false)
-            .addCafe(_editedCafe);
+            .addCafe(_editedCafe, chosenKuhni);
       } on PlatformException catch (error) {
         await showDialog(
           context: context,
@@ -131,7 +133,26 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
         Provider.of<CafeCategories>(context, listen: false).lastCafe.id;
     Navigator.of(context)
         .pushReplacementNamed(AddingFoodScreen.routeName, arguments: cafeid);
-    print('adding Cafe Screen $cafeid');
+  }
+
+  // kuhni
+  List<String> chosenKuhni = [];
+  void setStateIfMounted(f) {
+    if (mounted) setState(f);
+  }
+
+  void callBack(List<String> list) {
+    setStateIfMounted(() {
+      chosenKuhni = list;
+    });
+  }
+
+  void onDisMissed(int id) {
+    if (chosenKuhni.length > 0) {
+      chosenKuhni.removeAt(id);
+    } else {
+      return;
+    }
   }
 
   @override
@@ -186,6 +207,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                               return 'Please enter your last time.';
                             }
                           },
+                          keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
                           onFieldSubmitted: (_) {
                             FocusScope.of(context).requestFocus(_discountFocus);
@@ -206,6 +228,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                           onFieldSubmitted: (_) {
                             FocusScope.of(context).requestFocus(_imageUrlFocus);
                           },
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                               labelText: 'is there a promotion?',
                               hintText: '30'),
@@ -265,11 +288,8 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                               keyboardType: TextInputType.url,
                               focusNode: _imageUrlFocus,
                               enabled: _image != null ? false : true,
-                              textInputAction: TextInputAction.done,
+                              textInputAction: TextInputAction.next,
                               controller: _imageUrlController,
-                              onFieldSubmitted: (_) {
-                                _saveForm();
-                              },
                               validator: (value) {
                                 if (value.isEmpty) {
                                   return 'Please enter an image URL.';
@@ -302,17 +322,42 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                           height: 20,
                         ),
                         TextButton.icon(
-                          onPressed: _imageUrlController.text.isEmpty
-                              ? getImage
-                              : null,
-                          icon: Icon(Icons.camera),
-                          label: Text('Or choose from Gallery!'),
+                          onPressed:
+                              _imageUrlController.text != '' ? getImage : null,
+                          icon: Icon(
+                            Icons.camera,
+                            color: _imageUrlController.text != ''
+                                ? const Color(0xFF167F67)
+                                : Colors.grey.shade400,
+                          ),
+                          label: Text(
+                            'Or choose from Gallery!',
+                            style: TextStyle(color: const Color(0xFF167F67)),
+                          ),
                         ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Kuhni(callBack),
+                        if (chosenKuhni.isNotEmpty)
+                          ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: chosenKuhni.length,
+                            itemBuilder: (context, index) => KuhniListTile(
+                              chosenKuhni[index],
+                              onDisMissed,
+                              index,
+                            ),
+                          ),
                         SizedBox(
                           height: 20,
                         ),
                         ElevatedButton(
                           onPressed: _saveForm,
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                                  const Color(0xFF167F67))),
                           child: Text('Submit!'),
                         ),
                       ],

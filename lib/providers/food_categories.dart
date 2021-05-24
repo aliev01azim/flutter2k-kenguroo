@@ -69,7 +69,7 @@ class FoodCategories with ChangeNotifier {
   Future<void> fetchAndSetFoods(BuildContext context, String cafeId) async {
     final userId = FirebaseAuth.instance.currentUser.uid;
     var url = Uri.parse(
-        'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId/$cafeId/foods.json');
+        'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$cafeId/foods.json');
     try {
       final response = await get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -115,10 +115,8 @@ class FoodCategories with ChangeNotifier {
   }
 
   Future<void> addFood(FoodModel food) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
-
     final url = Uri.parse(
-        "https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId/${food.cafeId}/foods.json");
+        "https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/${food.cafeId}/foods.json");
     try {
       final response = await post(url,
           body: json.encode({
@@ -142,12 +140,11 @@ class FoodCategories with ChangeNotifier {
   }
 
   Future<void> updateFood(String id, FoodModel newFood) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
     final foodindex = _foods.indexWhere((element) => element.id == id);
     if (foodindex >= 0) {
       try {
         final url = Uri.parse(
-            'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId/${newFood.cafeId}/$id.json');
+            'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/${newFood.cafeId}/$id.json');
         await patch(url,
             body: json.encode({
               'title': newFood.title,
@@ -162,18 +159,18 @@ class FoodCategories with ChangeNotifier {
     }
   }
 
-  Future<void> deleteFood(String id) async {
-    try {
-      final existingCafe = _foods.firstWhere((element) => element.id == id);
-      final url = Uri.parse(
-          'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$id.json');
-      _foods.remove(existingCafe);
-      notifyListeners();
-      await delete(url);
-    } catch (e) {
-      throw e;
-    }
-  }
+  // Future<void> deleteFood(String id) async {
+  //   try {
+  //     final existingCafe = _foods.firstWhere((element) => element.id == id);
+  //     final url = Uri.parse(
+  //         'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$id.json');
+  //     _foods.remove(existingCafe);
+  //     notifyListeners();
+  //     await delete(url);
+  //   } catch (e) {
+  //     throw e;
+  //   }
+  // }
 
   FoodModel findById(String id) {
     return _foods.firstWhere((element) => element.id == id);

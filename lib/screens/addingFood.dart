@@ -210,6 +210,7 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
                           onFieldSubmitted: (_) {
                             FocusScope.of(context).requestFocus(_imageUrlFocus);
                           },
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                               labelText: 'price', hintText: '300'),
                           validator: (value) {
@@ -308,9 +309,8 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
                           height: 20,
                         ),
                         TextButton.icon(
-                          onPressed: _imageUrlController.text.isEmpty
-                              ? getImage
-                              : null,
+                          onPressed:
+                              _imageUrlController.text != '' ? getImage : null,
                           icon: Icon(Icons.camera),
                           label: Text('Or choose from Gallery!'),
                         ),

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:kenguroo/models/searching.dart';
+import 'package:kenguroo/providers/kuhni_provider.dart';
 import 'package:kenguroo/providers/search_provider.dart';
+import 'package:kenguroo/widgets/look_content.dart';
 import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -19,7 +21,6 @@ class LookScreen extends StatefulWidget {
 
 class _LookScreenState extends State<LookScreen> {
   final controller = FloatingSearchBarController();
-
   int _index = 0;
   int get index => _index;
   set index(int value) {
@@ -30,10 +31,7 @@ class _LookScreenState extends State<LookScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: buildSearchBar(),
-    );
+    return Scaffold(resizeToAvoidBottomInset: false, body: buildSearchBar());
   }
 
   Widget buildSearchBar() {
@@ -84,7 +82,9 @@ class _LookScreenState extends State<LookScreen> {
           child: IndexedStack(
             index: min(index, 0),
             children: const [
-              FloatingSearchAppBarExample(),
+              FloatingSearchAppBar(
+                body: LookContent(),
+              ),
             ],
           ),
         ),
@@ -213,34 +213,5 @@ class _LookScreenState extends State<LookScreen> {
   void dispose() {
     controller.dispose();
     super.dispose();
-  }
-}
-
-class FloatingSearchAppBarExample extends StatelessWidget {
-  const FloatingSearchAppBarExample({Key key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.only(top: 60),
-      itemCount: 100,
-      itemBuilder: (context, index) {
-        return InkWell(
-            onTap: () {},
-            child: Container(
-              padding: EdgeInsets.only(top: 10, bottom: 10, left: 15),
-              child: Row(
-                children: [
-                  Text(
-                    'Item $index',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Icon(Icons.arrow_right),
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              ),
-            ));
-      },
-    );
   }
 }

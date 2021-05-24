@@ -14,6 +14,7 @@ class CafeModel with ChangeNotifier {
   int discount;
   double rating;
   bool isFavorite;
+  List<String> chosenKuhni;
   CafeModel({
     this.id,
     @required this.time,
@@ -22,6 +23,7 @@ class CafeModel with ChangeNotifier {
     @required this.discount,
     this.rating = 0.0,
     this.isFavorite = false,
+    this.chosenKuhni,
   });
   void setFavValue(bool newVal) {
     isFavorite = newVal;
@@ -105,23 +107,20 @@ class CafeCategories with ChangeNotifier {
       final favoriteData = json.decode(favoriteResponse.body);
 
       final List<CafeModel> loadedProducts = [];
-      extractedData.forEach((key, value) {
-        value.forEach((prodId, prodData) {
-          loadedProducts.add(CafeModel(
-              id: prodId,
-              time: prodData['time'],
-              // rating:
-              //     mostRatedData == null ? false : mostRatedData[prodId] ?? false,
-              title: prodData['title'],
-              isFavorite:
-                  favoriteData == null ? false : favoriteData[prodId] ?? false,
-              imageUrl: prodData['imageUrl'],
-              discount: prodData['discount']));
-        });
+      extractedData.forEach((prodId, prodData) {
+        loadedProducts.add(CafeModel(
+            id: prodId,
+            time: prodData['time'],
+            // rating:
+            //     mostRatedData == null ? false : mostRatedData[prodId] ?? false,
+            title: prodData['title'],
+            isFavorite:
+                favoriteData == null ? false : favoriteData[prodId] ?? false,
+            imageUrl: prodData['imageUrl'],
+            discount: prodData['discount']));
       });
 
       _cafes = loadedProducts;
-      print(_cafes[0].title);
       notifyListeners();
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
@@ -137,11 +136,9 @@ class CafeCategories with ChangeNotifier {
     }
   }
 
-  Future<void> addCafe(CafeModel cafe) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
-
+  Future<void> addCafe(CafeModel cafe, List<String> chosenKuhni) async {
     final url = Uri.parse(
-        "https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId.json");
+        "https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes.json");
     try {
       final response = await post(url,
           body: json.encode({
@@ -149,29 +146,28 @@ class CafeCategories with ChangeNotifier {
             'imageUrl': cafe.imageUrl,
             'time': cafe.time,
             'discount': cafe.discount,
-            'creatorId': userId,
+            'kuhni': chosenKuhni,
           }));
       final newCafe = CafeModel(
           id: json.decode(response.body)['name'],
           time: cafe.time,
           title: cafe.title,
           discount: cafe.discount,
+          chosenKuhni: chosenKuhni,
           imageUrl: cafe.imageUrl);
       _cafes.add(newCafe);
       notifyListeners();
     } catch (e) {
-      print(e);
       throw e;
     }
   }
 
   Future<void> updateCafe(String id, CafeModel newCafe) async {
-    final userId = FirebaseAuth.instance.currentUser.uid;
     final cafeindex = _cafes.indexWhere((element) => element.id == id);
     if (cafeindex >= 0) {
       try {
         final url = Uri.parse(
-            'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$userId/$id.json');
+            'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$id.json');
         await patch(url,
             body: json.encode({
               'title': newCafe.title,
@@ -183,9 +179,7 @@ class CafeCategories with ChangeNotifier {
       } catch (e) {
         throw e;
       }
-    } else {
-      print('....');
-    }
+    } else {}
   }
 
   Future<void> deleteCafe(String id) async {
