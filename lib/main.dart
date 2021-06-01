@@ -17,12 +17,14 @@ import 'package:kenguroo/screens/account_subScreens.dart/spravka_screen.dart';
 import 'package:kenguroo/screens/auth_screen.dart';
 import 'package:kenguroo/screens/cafe_detail_screen.dart';
 import 'package:kenguroo/screens/kuhnya_category_screen.dart';
+import 'package:kenguroo/screens/look_poiskovik_screen.dart';
 import 'package:kenguroo/screens/splash_screen.dart';
 import 'package:kenguroo/screens/addingCafe.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/account_subScreens.dart/about_app_screen.dart';
 import 'screens/addingFood.dart';
+import 'screens/location_screen.dart';
 import 'widgets/bottom_NavBar.dart';
 
 void main() async {
@@ -88,13 +90,13 @@ class MyApp extends StatelessWidget {
           AddingCafeScreen.routeName: (context) => AddingCafeScreen(),
           AddingFoodScreen.routeName: (context) => AddingFoodScreen(),
           KuhnyaCategoryScreen.routeName: (context) => KuhnyaCategoryScreen(),
+          LookPoiskovikScreen.routeName: (context) => LookPoiskovikScreen(),
         },
       ),
       providers: [
         ChangeNotifierProvider.value(value: AuthProvider()),
         ChangeNotifierProvider.value(value: CafeCategories()),
         ChangeNotifierProvider.value(value: SearchModel()),
-        ChangeNotifierProvider.value(value: LocationProvider()),
         ChangeNotifierProvider.value(value: UserProvider()),
         ChangeNotifierProvider.value(value: FoodCategories()),
         ChangeNotifierProvider.value(value: KuhniProvider()),

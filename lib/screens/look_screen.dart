@@ -1,217 +1,85 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
-import 'package:implicitly_animated_reorderable_list/transitions.dart';
-import 'package:kenguroo/models/searching.dart';
-import 'package:kenguroo/providers/kuhni_provider.dart';
-import 'package:kenguroo/providers/search_provider.dart';
-import 'package:kenguroo/widgets/look_content.dart';
-import 'package:material_floating_search_bar/material_floating_search_bar.dart';
-import 'package:provider/provider.dart';
+import 'package:kenguroo/screens/kuhnya_category_screen.dart';
+import 'package:kenguroo/screens/look_poiskovik_screen.dart';
 
-import 'cafe_detail_screen.dart';
+class LookScreen extends StatelessWidget {
+  // Future<void> _fetch(BuildContext context) async {
+  //   await Provider.of<KuhniProvider>(context, listen: false)
+  //       .fetchAndSetCafesKuhni(context);
+  // }
 
-class LookScreen extends StatefulWidget {
   const LookScreen({Key key}) : super(key: key);
-
-  @override
-  _LookScreenState createState() => _LookScreenState();
-}
-
-class _LookScreenState extends State<LookScreen> {
-  final controller = FloatingSearchBarController();
-  int _index = 0;
-  int get index => _index;
-  set index(int value) {
-    _index = min(value, 2);
-    _index == 2 ? controller.hide() : controller.show();
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(resizeToAvoidBottomInset: false, body: buildSearchBar());
-  }
-
-  Widget buildSearchBar() {
-    final actions = [
-      FloatingSearchBarAction(
-        showIfOpened: false,
-        child: CircularButton(
-          icon: const Icon(Icons.search),
-          onPressed: null,
-        ),
-      ),
-      FloatingSearchBarAction.searchToClear(
-        showIfClosed: false,
-      ),
-    ];
-
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-
-    return Consumer<SearchModel>(
-      builder: (context, model, _) => FloatingSearchBar(
-        automaticallyImplyBackButton: false,
-        controller: controller,
-        clearQueryOnClose: true,
-        hint: 'Ресторан,блюдо или кухня',
-        iconColor: Colors.grey,
-        transitionDuration: const Duration(milliseconds: 400),
-        transitionCurve: Curves.easeInOutCubic,
-        physics: const BouncingScrollPhysics(),
-        axisAlignment: isPortrait ? 0.0 : -1.0,
-        openAxisAlignment: 0.0,
-        actions: actions,
-        progress: model.isLoading,
-        debounceDelay: const Duration(milliseconds: 500),
-        onQueryChanged: model.onQueryChanged,
-        scrollPadding: EdgeInsets.zero,
-        transition: CircularFloatingSearchBarTransition(spacing: 16),
-        builder: (context, _) => buildExpandableBody(model, controller.query),
-        body: buildBody(),
-      ),
-    );
-  }
-
-  Widget buildBody() {
-    return Column(
+    return Stack(
       children: [
-        Expanded(
-          child: IndexedStack(
-            index: min(index, 0),
-            children: const [
-              FloatingSearchAppBar(
-                body: LookContent(),
-              ),
+        Positioned(
+          top: 30,
+          left: 0,
+          right: 0,
+          child: TextField(
+            onTap: () {
+              Navigator.pushNamed(context, LookPoiskovikScreen.routeName);
+            },
+            decoration: InputDecoration(
+              hintText: 'Поиск',
+              filled: true,
+              fillColor: Colors.white.withAlpha(235),
+              border: null,
+              enabledBorder: null,
+              disabledBorder: null,
+              errorBorder: null,
+              focusedBorder: InputBorder.none,
+            ),
+            readOnly: true,
+            showCursor: false,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 70, left: 32, right: 32),
+          child: GridView(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, crossAxisSpacing: 30, mainAxisSpacing: 30),
+            children: [
+              lookGridItem('Нациоанальная', context),
+              lookGridItem('Европейская', context),
+              lookGridItem('Бургеры', context),
+              lookGridItem('Донеры', context),
+              lookGridItem('Пицца', context),
+              lookGridItem('Суши', context),
+              lookGridItem('Роллы', context),
+              lookGridItem('Фастфуд', context),
+              lookGridItem('Кофейни', context),
+              lookGridItem('Китайская', context),
+              lookGridItem('Итальянская', context),
             ],
           ),
         ),
-        // buildBottomNavigationBar(),
       ],
     );
   }
 
-  Widget buildExpandableBody(SearchModel model, String word) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Material(
-        color: Colors.white,
-        elevation: 4.0,
-        borderRadius: BorderRadius.circular(8),
-        child: ImplicitlyAnimatedList<FoodCategory>(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          items: model.suggestions.take(10).toList(),
-          areItemsTheSame: (a, b) => a == b,
-          itemBuilder: (context, animation, place, i) {
-            return SizeFadeTransition(
-              animation: animation,
-              child: buildItem(context, place, word),
-            );
-          },
-          updateItemBuilder: (context, animation, place) {
-            return FadeTransition(
-              opacity: animation,
-              child: buildItem(context, place, word),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget buildItem(BuildContext context, FoodCategory place, String word) {
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
-
-    final model = Provider.of<SearchModel>(context, listen: false);
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        InkWell(
-          onTap: () {
-            FloatingSearchBar.of(context).close();
-            Future.delayed(
-              const Duration(milliseconds: 500),
-              () {
-                var arguments2 = {
-                  place.categories == word ? word : null,
-                  place.foods == word ? word : null,
-                  place.restourants == word ? word : null
-                };
-                Navigator.pushNamed(context, CafeDetailScreen.routeName,
-                    arguments: arguments2);
-              } /*=> model.clear()*/,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 36,
-                  child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 500),
-                      child: const Icon(Icons.history, key: Key('history'))),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        word,
-                        style: textTheme.subtitle1,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+  Widget lookGridItem(String title, BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context)
+            .pushNamed(KuhnyaCategoryScreen.routeName, arguments: title);
+      },
+      child: Container(
+        height: 60,
+        width: 60,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            image: AssetImage('assets/images/food-placeholder.jpg'),
           ),
         ),
-        if (model.suggestions.isNotEmpty && place != model.suggestions.last)
-          const Divider(height: 0),
-      ],
+        child: Center(
+            child: Text(
+          title,
+          textAlign: TextAlign.center,
+        )),
+      ),
     );
-  }
-
-  // Widget buildBottomNavigationBar() {
-  //   return BottomNavigationBar(
-  //     onTap: (value) => index = value,
-  //     currentIndex: index,
-  //     elevation: 16,
-  //     type: BottomNavigationBarType.fixed,
-  //     showUnselectedLabels: true,
-  //     backgroundColor: Colors.white,
-  //     selectedItemColor: Colors.blue,
-  //     selectedFontSize: 11.5,
-  //     unselectedFontSize: 11.5,
-  //     unselectedItemColor: const Color(0xFF4d4d4d),
-  //     items: const [
-  //       BottomNavigationBarItem(
-  //         icon: Icon(MdiIcons.homeVariantOutline),
-  //         label: 'Explore',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(MdiIcons.homeCityOutline),
-  //         label: 'Commute',
-  //       ),
-  //       BottomNavigationBarItem(
-  //         icon: Icon(MdiIcons.homeCityOutline),
-  //         label: 'Commute',
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
   }
 }

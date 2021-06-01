@@ -3,8 +3,9 @@ import 'package:kenguroo/providers/cart.dart';
 import 'package:kenguroo/screens/account.dart';
 import 'package:kenguroo/screens/cart_screen.dart';
 import 'package:kenguroo/screens/categories_screen.dart';
-import 'package:kenguroo/screens/look_screen.dart' as LookScreen;
 import 'package:provider/provider.dart';
+
+import '../screens/look_screen.dart' as LookScreen;
 
 class BottomNavBar extends StatefulWidget {
   @override
