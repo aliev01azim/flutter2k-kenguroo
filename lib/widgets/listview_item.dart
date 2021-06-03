@@ -37,7 +37,6 @@ class ListViewItem extends StatelessWidget {
                           cafe.imageUrl,
                         ),
                         fit: BoxFit.cover,
-                        width: witdh,
                       ),
                     ),
                   ),

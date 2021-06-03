@@ -291,6 +291,9 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
                                 }
                                 return null;
                               },
+                              onChanged: (value) {
+                                setState(() {});
+                              },
                               onSaved: (value) {
                                 _editedFood = FoodModel(
                                   cafeId: cafeid,

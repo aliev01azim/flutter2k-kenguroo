@@ -20,6 +20,7 @@ import 'package:kenguroo/screens/kuhnya_category_screen.dart';
 import 'package:kenguroo/screens/look_poiskovik_screen.dart';
 import 'package:kenguroo/screens/splash_screen.dart';
 import 'package:kenguroo/screens/addingCafe.dart';
+import 'package:kenguroo/screens/test.dart';
 import 'package:provider/provider.dart';
 
 import 'screens/account_subScreens.dart/about_app_screen.dart';

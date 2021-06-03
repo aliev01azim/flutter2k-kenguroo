@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,6 +10,7 @@ import 'package:kenguroo/screens/addingFood.dart';
 import 'package:kenguroo/widgets/kuhni.dart';
 import 'package:kenguroo/widgets/kuhni_listtile.dart';
 import 'package:provider/provider.dart';
+import 'package:path/path.dart' as Path;
 
 class AddingCafeScreen extends StatefulWidget {
   static const routeName = '/adding-cafe-screen';
@@ -77,35 +80,67 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
     }
   }
 
+  // work with images
   File _image;
   final picker = ImagePicker();
-
   Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
+    final pickedFile = await picker.getImage(
+        source: ImageSource.gallery,
+        imageQuality: 60,
+        maxWidth: double.infinity);
     setState(() {
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
       }
     });
   }
 
+  String _uploadedFileURL;
+  var _timer;
+  // form
   Future<void> _saveForm() async {
-    final isValid = _formKey.currentState.validate();
-    if (!isValid) {
-      return;
-    }
+    // print('saveForm');
+    // final isValid = _formKey.currentState.validate();
+    // if (!isValid) {
+    //   print('da nuu');
+    //   return;
+    // }
     _formKey.currentState.save();
     setState(() {
       _isLoading = true;
     });
+    print(_image.path);
+    if (_image.path != null) {
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference storageReference =
+          storage.ref().child('images/${Path.basename(_image.path)}}');
+
+      UploadTask uploadTask = storageReference.putFile(_image);
+      await storageReference.getDownloadURL().then((fileURL) {
+        setState(() {
+          _uploadedFileURL = fileURL;
+          _editedCafe.imageUrl = _uploadedFileURL;
+        });
+        print('doljen peredast $_uploadedFileURL');
+        print('posle peredachi ${_editedCafe.imageUrl}');
+      });
+      uploadTask.then((res) {
+        res.ref.getDownloadURL();
+      });
+      print(
+          'smotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiii');
+      print(_editedCafe.imageUrl);
+      print('posle delaya $_uploadedFileURL');
+    }
+    print('posle vsego ${_editedCafe.imageUrl}');
+
     if (_editedCafe.id != null) {
       await Provider.of<CafeCategories>(context, listen: false)
           .updateCafe(_editedCafe.id, _editedCafe);
     } else {
       try {
+        print('adding cafe');
+
         await Provider.of<CafeCategories>(context, listen: false)
             .addCafe(_editedCafe, chosenKuhni);
       } on PlatformException catch (error) {
@@ -126,13 +161,15 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
         );
       }
     }
+    print('imageUrl:');
+    print(_editedCafe.imageUrl);
     setState(() {
       _isLoading = false;
     });
     final cafeid =
         Provider.of<CafeCategories>(context, listen: false).lastCafe.id;
     Navigator.of(context)
-        .pushReplacementNamed(AddingFoodScreen.routeName, arguments: cafeid);
+        .pushNamed(AddingFoodScreen.routeName, arguments: cafeid);
   }
 
   // kuhni
@@ -277,10 +314,9 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                                               fit: BoxFit.cover,
                                             )
                                           : Image.file(
-                                              _image,
+                                              File(_image.path),
                                               fit: BoxFit.cover,
-                                            ),
-                                    ),
+                                            )),
                             ),
                             TextFormField(
                               decoration:
@@ -294,10 +330,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                                 if (value.isEmpty) {
                                   return 'Please enter an image URL.';
                                 }
-                                if (!value.startsWith('http') &&
-                                    !value.startsWith('https')) {
-                                  return 'Please enter a valid URL.';
-                                }
+
                                 if (!value.endsWith('.png') &&
                                     !value.endsWith('.jpg') &&
                                     !value.endsWith('.jpeg')) {
@@ -315,6 +348,9 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                                   discount: _editedCafe.discount,
                                 );
                               },
+                              onChanged: (value) {
+                                setState(() {});
+                              },
                             ),
                           ],
                         ),
@@ -322,17 +358,18 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                           height: 20,
                         ),
                         TextButton.icon(
-                          onPressed:
-                              _imageUrlController.text != '' ? getImage : null,
-                          icon: Icon(
-                            Icons.camera,
-                            color: _imageUrlController.text != ''
-                                ? const Color(0xFF167F67)
-                                : Colors.grey.shade400,
-                          ),
+                          onPressed: _imageUrlController.text.isNotEmpty
+                              ? null
+                              : getImage,
+                          icon: Icon(Icons.camera,
+                              color: _imageUrlController.text.isNotEmpty
+                                  ? Colors.grey.shade400
+                                  : const Color(0xFF167F67)),
                           label: Text(
                             'Or choose from Gallery!',
-                            style: TextStyle(color: const Color(0xFF167F67)),
+                            style: _imageUrlController.text.isNotEmpty
+                                ? TextStyle(color: Colors.grey)
+                                : TextStyle(color: const Color(0xFF167F67)),
                           ),
                         ),
                         SizedBox(

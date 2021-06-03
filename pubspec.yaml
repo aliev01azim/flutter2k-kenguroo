@@ -28,14 +28,14 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_auth: ^1.1.2
   firebase_core: ^1.1.0
+  firebase_storage: ^8.1.1
   provider: ^5.0.0
   http: ^0.13.2
-  material_floating_search_bar: ^0.3.4
-  implicitly_animated_reorderable_list: ^0.4.0
   dio: ^4.0.0
   flutter_polyline_points: ^0.2.6
   google_maps_flutter: ^2.0.2
   image_picker: ^0.7.5
+  get: ^4.1.4
 dev_dependencies:
   flutter_test:
     sdk: flutter

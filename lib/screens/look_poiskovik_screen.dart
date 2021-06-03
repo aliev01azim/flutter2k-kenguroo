@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:kenguroo/controllers/poiskovik_controller.dart';
+import 'package:kenguroo/models/poiskoviks_data.dart';
+import 'package:kenguroo/screens/cafe_detail_screen.dart';
 
-class Movie {
-  final String imageName;
-  final String title;
-  final String time;
-  final String description;
-
-  Movie({
-    this.imageName,
-    this.title,
-    this.time,
-    this.description,
-  });
-}
+import 'kuhnya_category_screen.dart';
 
 class LookPoiskovikScreen extends StatefulWidget {
   LookPoiskovikScreen({Key key}) : super(key: key);
@@ -22,101 +14,31 @@ class LookPoiskovikScreen extends StatefulWidget {
 }
 
 class _LookPoiskovikScreenState extends State<LookPoiskovikScreen> {
-  final _movies = [
-    Movie(
-      title: 'Смертельная битва',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Прибытие',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Назад в будущее 1',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Назад в будущее 2',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Назад в будущее 3',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Первому игроку приготовится',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Пиксели',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Человек паук',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Лига справедливости',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Человек из стали',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Мстители',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Форд против феррари',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Джентельмены',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Тихие зори',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'В бой идут одни старики',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-    Movie(
-      title: 'Дюна',
-      time: 'April  7, 2021',
-      description: 'Washed-up MMA fighter Cole Young, unaware of his heritage',
-    ),
-  ];
-
-  var _filteredMovies = <Movie>[];
-
+  final PoiskovikController _controller = Get.put(PoiskovikController());
+  var _filteredData = <PoiskoviksDataModel>[];
   final _searchController = TextEditingController();
-
-  void _searchMovies() {
+  bool enabled = true;
+  var tabIndex = 0;
+  void _search() {
     final query = _searchController.text;
     if (query.isNotEmpty) {
-      _filteredMovies = _movies.where((Movie movie) {
-        return movie.title.toLowerCase().contains(query.toLowerCase());
-      }).toList();
+      if (tabIndex == 0) {
+        _filteredData = _controller.dataList
+            .where((PoiskoviksDataModel model) =>
+                model.restoranTitle.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      } else if (tabIndex == 1) {
+        _filteredData = _controller.dataList
+            .where((model) => model.foods.values.any((element) {
+                  return element['title']
+                      .toString()
+                      .toLowerCase()
+                      .contains(query.toLowerCase());
+                }))
+            .toList();
+      }
     } else {
-      _filteredMovies = _movies;
+      _filteredData = _controller.dataList;
     }
     setState(() {});
   }
@@ -124,9 +46,17 @@ class _LookPoiskovikScreenState extends State<LookPoiskovikScreen> {
   @override
   void initState() {
     super.initState();
+    _filteredData = _controller.dataList;
+    _searchController.addListener(_search);
+  }
 
-    _filteredMovies = _movies;
-    _searchController.addListener(_searchMovies);
+  @override
+  void dispose() {
+    _searchController.removeListener(() {
+      _search();
+    });
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -153,13 +83,21 @@ class _LookPoiskovikScreenState extends State<LookPoiskovikScreen> {
               ),
             ],
             onTap: (value) {
-              setState(() {});
+              setState(() {
+                tabIndex = value;
+                if (tabIndex == 2) {
+                  enabled = false;
+                } else {
+                  enabled = true;
+                }
+              });
             },
           ),
           actions: [
             Container(
               width: (MediaQuery.of(context).size.width - 60),
               child: TextField(
+                style: TextStyle(color: Colors.black),
                 controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Поиск',
@@ -167,87 +105,131 @@ class _LookPoiskovikScreenState extends State<LookPoiskovikScreen> {
                   fillColor: Colors.white.withAlpha(235),
                   border: InputBorder.none,
                 ),
+                enabled: enabled,
               ),
             ),
           ],
         ),
-        // body: ListView.builder(
-        //   padding: EdgeInsets.only(top: 70),
-        //   keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        //   itemCount: _filteredMovies.length,
-        //   itemExtent: 163,
-        //   itemBuilder: (BuildContext context, int index) {
-        //     final movie = _filteredMovies[index];
-        //     return Padding(
-        //       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        //       child: Stack(
-        //         children: [
-        //           Container(
-        //             decoration: BoxDecoration(
-        //               color: Colors.white,
-        //               border: Border.all(color: Colors.black.withOpacity(0.2)),
-        //               borderRadius: BorderRadius.all(Radius.circular(10)),
-        //               boxShadow: [
-        //                 BoxShadow(
-        //                   color: Colors.black.withOpacity(0.1),
-        //                   blurRadius: 8,
-        //                   offset: Offset(0, 2),
-        //                 ),
-        //               ],
-        //             ),
-        //             clipBehavior: Clip.hardEdge,
-        //             child: Row(
-        //               children: [
-        //                 SizedBox(width: 15),
-        //                 Expanded(
-        //                   child: Column(
-        //                     crossAxisAlignment: CrossAxisAlignment.start,
-        //                     children: [
-        //                       SizedBox(height: 20),
-        //                       Text(
-        //                         movie.title,
-        //                         style: TextStyle(fontWeight: FontWeight.bold),
-        //                         maxLines: 1,
-        //                         overflow: TextOverflow.ellipsis,
-        //                       ),
-        //                       SizedBox(height: 5),
-        //                       Text(
-        //                         movie.time,
-        //                         style: TextStyle(color: Colors.grey),
-        //                         maxLines: 1,
-        //                         overflow: TextOverflow.ellipsis,
-        //                       ),
-        //                       SizedBox(height: 20),
-        //                       Text(
-        //                         movie.description,
-        //                         maxLines: 2,
-        //                         overflow: TextOverflow.ellipsis,
-        //                       ),
-        //                     ],
-        //                   ),
-        //                 ),
-        //                 SizedBox(width: 10),
-        //               ],
-        //             ),
-        //           ),
-        //           Material(
-        //             color: Colors.transparent,
-        //             child: InkWell(
-        //               borderRadius: BorderRadius.circular(10),
-        //               onTap: () {
-        //                 print('11');
-        //               },
-        //             ),
-        //           ),
-        //         ],
-        //       ),
-        //     );
-        //   },
-        // ),
         body: TabBarView(children: [
-          Text('a=b'),
-          Text('c'),
+          Obx(
+            () => _controller.isLoading.value
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      itemCount: _filteredData.length,
+                      itemBuilder: (context, index) {
+                        final restoranId = _filteredData[index].restoranId;
+                        return ListTile(
+                          onTap: () {
+                            Navigator.of(context).pushNamed(
+                                CafeDetailScreen.routeName,
+                                arguments: restoranId);
+                          },
+                          title: Text(
+                            _filteredData[index].restoranTitle,
+                            maxLines: 1,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+          Obx(
+            () => _controller.isLoading.value
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: _filteredData.length,
+                      itemBuilder: (context, index) {
+                        final restoranId = _filteredData[index].restoranId;
+                        return ListView.builder(
+                          physics: const ScrollPhysics(
+                              parent: NeverScrollableScrollPhysics()),
+                          shrinkWrap: true,
+                          itemCount: _filteredData[index].foods.values.length,
+                          itemBuilder: (context, i) => _filteredData[index]
+                                  .foods
+                                  .values
+                                  .toList()[i]['title']
+                                  .contains(_searchController.text)
+                              ? Column(children: [
+                                  ListTile(
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                          CafeDetailScreen.routeName,
+                                          arguments: restoranId);
+                                    },
+                                    title: Text(
+                                      _filteredData[index]
+                                          .foods
+                                          .values
+                                          .toList()[i]['title'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                      maxLines: 3,
+                                    ),
+                                    leading: Image.network(_filteredData[index]
+                                        .foods
+                                        .values
+                                        .toList()[i]['imageUrl']),
+                                    subtitle: Text(
+                                      'Стоимость \n ${_filteredData[index].foods.values.toList()[i]['discount']}',
+                                      style: TextStyle(
+                                          color: Colors.grey, height: 1.5),
+                                    ),
+                                  ),
+                                  Divider()
+                                ])
+                              : Container(
+                                  height: 0,
+                                ),
+                        );
+                      },
+                    ),
+                  ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10),
+            child: ListView(
+              children: [
+                item('Нациоанальная', context),
+                item('Европейская', context),
+                item('Бургеры', context),
+                item('Донеры', context),
+                item('Пицца', context),
+                item('Суши', context),
+                item('Роллы', context),
+                item('Фастфуд', context),
+                item('Кофейни', context),
+                item('Китайская', context),
+                item('Итальянская', context),
+              ],
+            ),
+          ),
         ]),
+      ),
+    );
+  }
+
+  Widget item(String title, BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context)
+            .pushNamed(KuhnyaCategoryScreen.routeName, arguments: title);
+      },
+      child: ListTile(
+        title: Text(
+          title,
+        ),
       ),
     );
   }
