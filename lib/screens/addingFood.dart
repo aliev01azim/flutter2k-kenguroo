@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as Path;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -76,30 +78,48 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
     }
   }
 
-  File _image;
-  final picker = ImagePicker();
+  bool _isLoadingImage = false;
+  String imageUrl;
+  PickedFile _image;
+  uploadImage() async {
+    final _firebaseStorage = FirebaseStorage.instance;
+    final _imagePicker = ImagePicker();
+    //Select Image
+    _image = await _imagePicker.getImage(
+        source: ImageSource.gallery, imageQuality: 50);
+    var file = File(_image.path);
 
-  Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
+    if (_image != null) {
+      setState(() {
+        _isLoadingImage = true;
+      });
+      //Upload to Firebase
+      var snapshot = await _firebaseStorage
+          .ref()
+          .child('images/${Path.basename(_image.path)}}')
+          .putFile(file);
+      var downloadUrl = await snapshot.ref.getDownloadURL();
+      setState(() {
+        imageUrl = downloadUrl;
+        _editedFood.imageUrl = downloadUrl;
+      });
+      print(_editedFood.imageUrl);
+    }
     setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
+      _isLoadingImage = false;
     });
   }
 
   Future<void> _saveForm() async {
-    final isValid = _formKey.currentState.validate();
-    if (!isValid) {
-      return;
-    }
+    // final isValid = _formKey.currentState.validate();
+    // if (!isValid) {
+    //   return;
+    // }
     _formKey.currentState.save();
     setState(() {
       _isLoading = true;
     });
+    _editedFood.imageUrl = imageUrl;
     if (_editedFood.id != null) {
       await Provider.of<FoodCategories>(context, listen: false)
           .updateFood(_editedFood.id, _editedFood);
@@ -128,7 +148,7 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
     setState(() {
       _isLoading = false;
     });
-    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacementNamed('/');
   }
 
   @override
@@ -246,24 +266,31 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
                                   color: Colors.grey,
                                 ),
                               ),
-                              child: _imageUrlController.text.isEmpty &&
-                                      _image == null
-                                  ? Center(
-                                      child: Text(
-                                      'no image taken yet',
-                                      textAlign: TextAlign.center,
-                                    ))
-                                  : FittedBox(
-                                      child: _imageUrlController.text.isNotEmpty
-                                          ? Image.network(
-                                              _imageUrlController.text,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.file(
-                                              _image,
-                                              fit: BoxFit.cover,
-                                            ),
-                                    ),
+                              child: _isLoadingImage
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Center(
+                                          child: CircularProgressIndicator()),
+                                    )
+                                  : _imageUrlController.text.isEmpty &&
+                                          imageUrl == null
+                                      ? Center(
+                                          child: Text(
+                                          'no image taken yet',
+                                          textAlign: TextAlign.center,
+                                        ))
+                                      : FittedBox(
+                                          child: _imageUrlController
+                                                      .text.isNotEmpty &&
+                                                  imageUrl == null
+                                              ? Image.network(
+                                                  _imageUrlController.text,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.network(
+                                                  imageUrl,
+                                                  fit: BoxFit.cover,
+                                                )),
                             ),
                             TextFormField(
                               decoration:
@@ -312,8 +339,9 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
                           height: 20,
                         ),
                         TextButton.icon(
-                          onPressed:
-                              _imageUrlController.text != '' ? getImage : null,
+                          onPressed: _imageUrlController.text.isNotEmpty
+                              ? null
+                              : uploadImage,
                           icon: Icon(Icons.camera),
                           label: Text('Or choose from Gallery!'),
                         ),

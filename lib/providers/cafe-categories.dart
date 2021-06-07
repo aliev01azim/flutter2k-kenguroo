@@ -4,7 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CafeModel with ChangeNotifier {
   String id;
@@ -83,8 +85,25 @@ class CafeCategories with ChangeNotifier {
     return _cafes.last;
   }
 
-  Future<void> fetchAndSetCafes(BuildContext context,
+  Box box;
+  Future openBox() async {
+    var dir = await getApplicationDocumentsDirectory();
+    Hive.init(dir.path);
+    box = await Hive.openBox('categories');
+    return;
+  }
+
+  Future putData(data) async {
+    await box.clear();
+    for (var d in data) {
+      box.add(d);
+    }
+  }
+
+  Future<bool> fetchAndSetCafes(BuildContext context,
       [bool filterByUser = false]) async {
+    await openBox();
+
     final userId = FirebaseAuth.instance.currentUser.uid;
 
     final filterString =
@@ -94,13 +113,7 @@ class CafeCategories with ChangeNotifier {
     try {
       final response = await get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-      if (extractedData == null) {
-        return;
-      }
-      // url = Uri.parse(
-      //     'https://kenguroo-14a75-default-rtdb.firebaseio.com/mostRated.json');
-      // final mostRatedResponse = await get(url);
-      // final mostRatedData = json.decode(mostRatedResponse.body);
+
       url = Uri.parse(
           'https://kenguroo-14a75-default-rtdb.firebaseio.com/userFavorites/$userId.json');
       final favoriteResponse = await get(url);
@@ -121,6 +134,8 @@ class CafeCategories with ChangeNotifier {
       });
 
       _cafes = loadedProducts;
+      await putData(_cafes);
+
       notifyListeners();
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
@@ -134,6 +149,11 @@ class CafeCategories with ChangeNotifier {
         ),
       );
     }
+    var mymap = box.values.toList();
+    if (mymap.isNotEmpty) {
+      _cafes = mymap;
+    }
+    return Future.value(true);
   }
 
   Future<void> addCafe(CafeModel cafe, List<String> chosenKuhni) async {

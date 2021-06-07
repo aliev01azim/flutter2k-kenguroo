@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
+import 'package:kenguroo/screens/location_screen.dart';
 import 'package:kenguroo/widgets/listview_item.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +25,9 @@ class CategoriesScreen extends StatelessWidget {
               Icons.subdirectory_arrow_right_sharp,
               color: Colors.green,
             ),
-            onPressed: () {}),
+            onPressed: () {
+              Navigator.of(context).pushNamed(MapScreen.routeName);
+            }),
       ),
       body: FutureBuilder(
         future: _fetchAndSet(context),

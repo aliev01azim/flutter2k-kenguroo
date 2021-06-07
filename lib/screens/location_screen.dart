@@ -7,7 +7,7 @@ import 'package:kenguroo/models/direction.dart';
 
 class MapScreen extends StatefulWidget {
   final bool isSelecting;
-
+  static const routeName = '/location-screen';
   MapScreen({
     this.isSelecting = false,
   });

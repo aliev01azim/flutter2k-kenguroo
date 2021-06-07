@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -80,67 +79,56 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
     }
   }
 
-  // work with images
-  File _image;
-  final picker = ImagePicker();
-  Future getImage() async {
-    final pickedFile = await picker.getImage(
-        source: ImageSource.gallery,
-        imageQuality: 60,
-        maxWidth: double.infinity);
+// working with images and uplading to firebase storage
+  bool _isLoadingImage = false;
+  String imageUrl;
+  PickedFile _image;
+  uploadImage() async {
+    final _firebaseStorage = FirebaseStorage.instance;
+    final _imagePicker = ImagePicker();
+    //Select Image
+    _image = await _imagePicker.getImage(
+        source: ImageSource.gallery, imageQuality: 50);
+    var file = File(_image.path);
+
+    if (_image != null) {
+      setState(() {
+        _isLoadingImage = true;
+      });
+      //Upload to Firebase
+      var snapshot = await _firebaseStorage
+          .ref()
+          .child('images/${Path.basename(_image.path)}}')
+          .putFile(file);
+      var downloadUrl = await snapshot.ref.getDownloadURL();
+      setState(() {
+        imageUrl = downloadUrl;
+        _editedCafe.imageUrl = downloadUrl;
+      });
+      print(_editedCafe.imageUrl);
+    }
     setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      }
+      _isLoadingImage = false;
     });
   }
 
-  String _uploadedFileURL;
-  var _timer;
   // form
   Future<void> _saveForm() async {
-    // print('saveForm');
     // final isValid = _formKey.currentState.validate();
     // if (!isValid) {
-    //   print('da nuu');
     //   return;
     // }
     _formKey.currentState.save();
     setState(() {
       _isLoading = true;
     });
-    print(_image.path);
-    if (_image.path != null) {
-      FirebaseStorage storage = FirebaseStorage.instance;
-      Reference storageReference =
-          storage.ref().child('images/${Path.basename(_image.path)}}');
-
-      UploadTask uploadTask = storageReference.putFile(_image);
-      await storageReference.getDownloadURL().then((fileURL) {
-        setState(() {
-          _uploadedFileURL = fileURL;
-          _editedCafe.imageUrl = _uploadedFileURL;
-        });
-        print('doljen peredast $_uploadedFileURL');
-        print('posle peredachi ${_editedCafe.imageUrl}');
-      });
-      uploadTask.then((res) {
-        res.ref.getDownloadURL();
-      });
-      print(
-          'smotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiiismotriiiiiiiiii');
-      print(_editedCafe.imageUrl);
-      print('posle delaya $_uploadedFileURL');
-    }
-    print('posle vsego ${_editedCafe.imageUrl}');
+    _editedCafe.imageUrl = imageUrl;
 
     if (_editedCafe.id != null) {
       await Provider.of<CafeCategories>(context, listen: false)
           .updateCafe(_editedCafe.id, _editedCafe);
     } else {
       try {
-        print('adding cafe');
-
         await Provider.of<CafeCategories>(context, listen: false)
             .addCafe(_editedCafe, chosenKuhni);
       } on PlatformException catch (error) {
@@ -161,8 +149,6 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
         );
       }
     }
-    print('imageUrl:');
-    print(_editedCafe.imageUrl);
     setState(() {
       _isLoading = false;
     });
@@ -300,23 +286,31 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                                   color: Colors.grey,
                                 ),
                               ),
-                              child: _imageUrlController.text.isEmpty &&
-                                      _image == null
-                                  ? Center(
-                                      child: Text(
-                                      'no image taken yet',
-                                      textAlign: TextAlign.center,
-                                    ))
-                                  : FittedBox(
-                                      child: _imageUrlController.text.isNotEmpty
-                                          ? Image.network(
-                                              _imageUrlController.text,
-                                              fit: BoxFit.cover,
-                                            )
-                                          : Image.file(
-                                              File(_image.path),
-                                              fit: BoxFit.cover,
-                                            )),
+                              child: _isLoadingImage
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Center(
+                                          child: CircularProgressIndicator()),
+                                    )
+                                  : _imageUrlController.text.isEmpty &&
+                                          imageUrl == null
+                                      ? Center(
+                                          child: Text(
+                                          'no image taken yet',
+                                          textAlign: TextAlign.center,
+                                        ))
+                                      : FittedBox(
+                                          child: _imageUrlController
+                                                      .text.isNotEmpty &&
+                                                  imageUrl == null
+                                              ? Image.network(
+                                                  _imageUrlController.text,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : Image.network(
+                                                  imageUrl,
+                                                  fit: BoxFit.cover,
+                                                )),
                             ),
                             TextFormField(
                               decoration:
@@ -360,7 +354,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                         TextButton.icon(
                           onPressed: _imageUrlController.text.isNotEmpty
                               ? null
-                              : getImage,
+                              : uploadImage,
                           icon: Icon(Icons.camera,
                               color: _imageUrlController.text.isNotEmpty
                                   ? Colors.grey.shade400

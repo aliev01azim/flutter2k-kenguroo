@@ -150,6 +150,7 @@ class _LookPoiskovikScreenState extends State<LookPoiskovikScreen> {
                       itemCount: _filteredData.length,
                       itemBuilder: (context, index) {
                         final restoranId = _filteredData[index].restoranId;
+                        print(_filteredData[index].foods..length);
                         return ListView.builder(
                           physics: const ScrollPhysics(
                               parent: NeverScrollableScrollPhysics()),

@@ -12,43 +12,35 @@ class Test extends StatefulWidget {
 }
 
 class _TestState extends State<Test> {
-  File _image;
-  final picker = ImagePicker();
-  String _uploadedFileURL;
-  Future getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      }
-    });
-  }
-
   bool isLoading = false;
-  Future uploadFile() async {
-    setState(() {
-      isLoading = true;
-    });
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference storageReference =
-        storage.ref().child('imagess/${Path.basename(_image.path)}}');
 
-    UploadTask uploadTask = storageReference.putFile(_image);
-    Future.delayed(Duration(seconds: 2), () {
-      storageReference =
-          storage.ref().child('imagess/${Path.basename(_image.path)}}');
-      uploadTask = storageReference.putFile(_image);
-      uploadTask.then((res) {
-        uploadTask.snapshot.ref.getDownloadURL();
+  String imageUrl;
+  PickedFile image;
+  uploadImage() async {
+    final _firebaseStorage = FirebaseStorage.instance;
+    final _imagePicker = ImagePicker();
+    //Check Permissions
+
+    //Select Image
+    image = await _imagePicker.getImage(
+        source: ImageSource.gallery, imageQuality: 50);
+    var file = File(image.path);
+
+    if (image != null) {
+      setState(() {
+        isLoading = true;
       });
-      storageReference.getDownloadURL().then((fileURL) {
-        setState(() {
-          _uploadedFileURL = fileURL;
-          isLoading = false;
-        });
+      //Upload to Firebase
+      var snapshot =
+          await _firebaseStorage.ref().child('imagess/imageName').putFile(file);
+      var downloadUrl = await snapshot.ref.getDownloadURL();
+      setState(() {
+        imageUrl = downloadUrl;
+        isLoading = false;
       });
-    });
+    } else {
+      print('No Image Path Received');
+    }
   }
 
   @override
@@ -57,40 +49,21 @@ class _TestState extends State<Test> {
       appBar: AppBar(
         title: Text('Firestore File Upload'),
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Center(
-              child: Column(
-                children: <Widget>[
-                  Text('Selected Image'),
-                  _image != null
-                      ? Image.file(
-                          File(_image.path),
-                          height: 150,
-                        )
-                      : Container(height: 150),
-                  _image == null
-                      ? TextButton(
-                          child: Text('Choose File'),
-                          onPressed: getImage,
-                        )
-                      : Container(),
-                  _image != null
-                      ? TextButton(
-                          child: Text('Upload File'),
-                          onPressed: uploadFile,
-                        )
-                      : Container(),
-                  Text('Uploaded Image'),
-                  _uploadedFileURL != null
-                      ? Image.network(
-                          _uploadedFileURL,
-                          height: 150,
-                        )
-                      : Container(),
-                ],
-              ),
+      body: Center(
+        child: Column(
+          children: <Widget>[
+            Text('Selected Image'),
+            TextButton(
+              child: const Text('Upload File'),
+              onPressed: uploadImage,
             ),
+            const Text('Uploaded Image'),
+            imageUrl != null
+                ? Image.network(imageUrl)
+                : Image.network('https://i.imgur.com/sUFH1Aq.png')
+          ],
+        ),
+      ),
     );
   }
 }

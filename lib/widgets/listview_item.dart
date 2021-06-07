@@ -8,7 +8,6 @@ class ListViewItem extends StatelessWidget {
   final uid = FirebaseAuth.instance.currentUser.uid;
   final CafeModel cafe;
   ListViewItem(this.cafe);
-  void onChanged() {}
   @override
   Widget build(BuildContext context) {
     final witdh = MediaQuery.of(context).size.width * 0.8;

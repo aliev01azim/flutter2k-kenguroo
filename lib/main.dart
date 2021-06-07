@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kenguroo/providers/cart.dart';
 import 'package:kenguroo/providers/food_categories.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
@@ -29,6 +31,7 @@ import 'screens/location_screen.dart';
 import 'widgets/bottom_NavBar.dart';
 
 void main() async {
+  await Hive.initFlutter();
   runApp(MyApp());
 }
 
