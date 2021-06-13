@@ -20,7 +20,6 @@ class _PartnersScreenState extends State<PartnersScreen> {
   Future<void> _getUsersType(BuildContext context) async {
     bools = await Provider.of<UserProvider>(context, listen: false)
         .getUsersType(userId);
-    print(bools);
     isCourier = bools['isCourier'];
     isRestorator = bools['isResorator'];
     justUser = bools['justUser'];

@@ -1,4 +1,4 @@
-import 'package:kenguroo/providers/cafe-categories.dart';
+import 'cafe_model.dart';
 
 class KuhnyaModel {
   String name;

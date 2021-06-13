@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kenguroo/models/food_model.dart';
 import 'package:kenguroo/providers/cart.dart';
-import 'package:kenguroo/providers/food_categories.dart';
 import 'package:kenguroo/screens/cafe_detail_screen.dart';
 import 'package:provider/provider.dart';
 

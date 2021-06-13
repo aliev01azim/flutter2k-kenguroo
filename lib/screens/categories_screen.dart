@@ -31,89 +31,83 @@ class CategoriesScreen extends StatelessWidget {
       ),
       body: FutureBuilder(
         future: _fetchAndSet(context),
-        builder: (context, snapshot) =>
-            snapshot.connectionState == ConnectionState.waiting
-                ? Center(child: CircularProgressIndicator())
-                : RefreshIndicator(
-                    onRefresh: () => _fetchAndSet(context),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 14, top: 0),
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 20),
-                            child: Text(
-                              'Акции и Скидки',
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            height: 225,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: cafecategories.discountCafes.length,
-                              itemBuilder: (context, index) =>
-                                  ChangeNotifierProvider.value(
-                                value: cafecategories.discountCafes[index],
-                                child: ListViewItem(
-                                    cafecategories.discountCafes[index]),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 23,
-                          ),
-                          Text(
-                            'Популярные',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            height: 205,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: cafecategories.popularCafes.length,
-                              itemBuilder: (context, index) =>
-                                  ChangeNotifierProvider.value(
-                                value: cafecategories.popularCafes[index],
-                                child: ListViewItem(
-                                    cafecategories.popularCafes[index]),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 23,
-                          ),
-                          Text(
-                            'Ближайшие',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            child: ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: cafecategories.closestCafes.length,
-                              itemBuilder: (context, index) =>
-                                  ChangeNotifierProvider.value(
-                                value: cafecategories.closestCafes[index],
-                                child: ListViewItem(
-                                    cafecategories.closestCafes[index]),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+        builder: (context, snapshot) => RefreshIndicator(
+          onRefresh: () => _fetchAndSet(context),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 14, top: 0),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: Text(
+                    'Акции и Скидки',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 225,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: cafecategories.discountCafes.length,
+                    itemBuilder: (context, index) =>
+                        ChangeNotifierProvider.value(
+                      value: cafecategories.discountCafes[index],
+                      child: ListViewItem(cafecategories.discountCafes[index]),
                     ),
                   ),
+                ),
+                SizedBox(
+                  height: 23,
+                ),
+                Text(
+                  'Популярные',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 205,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: cafecategories.popularCafes.length,
+                    itemBuilder: (context, index) =>
+                        ChangeNotifierProvider.value(
+                      value: cafecategories.popularCafes[index],
+                      child: ListViewItem(cafecategories.popularCafes[index]),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 23,
+                ),
+                Text(
+                  'Ближайшие',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  child: ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: cafecategories.closestCafes.length,
+                    itemBuilder: (context, index) =>
+                        ChangeNotifierProvider.value(
+                      value: cafecategories.closestCafes[index],
+                      child: ListViewItem(cafecategories.closestCafes[index]),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

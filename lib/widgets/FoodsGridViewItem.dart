@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:kenguroo/models/food_model.dart';
 import 'package:kenguroo/providers/cart.dart';
-import 'package:kenguroo/providers/food_categories.dart';
 import 'package:provider/provider.dart';
 
 class FoodsGridViewItem extends StatelessWidget {
@@ -21,18 +21,17 @@ class FoodsGridViewItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
         child: GestureDetector(
-          onTap: () {
-            _modalBottomSheetMenu(
-                context, food, cafeId, cafeTitle, cafeDostavkaTime, cafeSkidka);
-          },
-          child: FadeInImage(
-            placeholder: AssetImage('assets/images/food-placeholder.jpg'),
-            image: food.imageUrl.startsWith('http')
-                ? NetworkImage(food.imageUrl)
-                : FileImage(File(food.imageUrl)),
-            fit: BoxFit.cover,
-          ),
-        ),
+            onTap: () {
+              _modalBottomSheetMenu(context, food, cafeId, cafeTitle,
+                  cafeDostavkaTime, cafeSkidka);
+            },
+            child: FadeInImage(
+              placeholder: AssetImage('assets/images/food-placeholder.jpg'),
+              image: food.imageUrl.startsWith('http')
+                  ? NetworkImage(food.imageUrl)
+                  : FileImage(File(food.imageUrl)),
+              fit: BoxFit.cover,
+            )),
         footer: GridTileBar(
           backgroundColor: Colors.black87,
           leading: Consumer<FoodModel>(
@@ -40,7 +39,7 @@ class FoodsGridViewItem extends StatelessWidget {
               icon: Icon(
                 food.isFavorite ? Icons.favorite : Icons.favorite_border,
               ),
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).colorScheme.secondary,
               onPressed: () {
                 food.toggleFavoriteStatus(userId);
               },
@@ -58,7 +57,7 @@ class FoodsGridViewItem extends StatelessWidget {
               _modalBottomSheetMenu(context, food, cafeId, cafeTitle,
                   cafeDostavkaTime, cafeSkidka);
             },
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart' as u;
 import 'package:flutter/cupertino.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart';
 import 'package:kenguroo/models/user.dart';
 
@@ -98,6 +99,7 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> getUserImageAndEmail(u.User user) async {
+    final box = await Hive.openBox('check_user');
     var url = Uri.parse(
         'https://kenguroo-14a75-default-rtdb.firebaseio.com/users/${user.uid}.json');
     final response = await get(url);
@@ -111,6 +113,8 @@ class UserProvider with ChangeNotifier {
       'userEmail': map['email'],
       'isRestorator': map2['isResorator'],
     };
+    box.put('data', object);
+    object = box.get('data');
     notifyListeners();
     return object;
   }

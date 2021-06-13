@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'food_categories.dart';
+import 'package:kenguroo/models/food_model.dart';
 
 class Cart with ChangeNotifier {
   Map<String, FoodModel> _items = {};

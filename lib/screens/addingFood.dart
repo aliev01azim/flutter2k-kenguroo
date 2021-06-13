@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:kenguroo/models/food_model.dart';
 import 'package:path/path.dart' as Path;
 
 import 'package:flutter/material.dart';
@@ -29,7 +30,6 @@ class _AddingFoodScreenState extends State<AddingFoodScreen> {
   };
   var _editedFood =
       FoodModel(id: null, time: '', title: '', imageUrl: '', discount: 0);
-  var _isInit = true;
   var _isLoading = false;
   @override
   void initState() {

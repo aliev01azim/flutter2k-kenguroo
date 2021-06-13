@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kenguroo/providers/cafe-categories.dart';
+import 'package:kenguroo/models/cafe_model.dart';
 import 'package:kenguroo/screens/cafe_detail_screen.dart';
 
 class FavListViewItem extends StatelessWidget {

@@ -5,8 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
-
-import 'cafe-categories.dart';
+import 'package:kenguroo/models/cafe_model.dart';
 
 class KuhniProvider with ChangeNotifier {
   List<CafeModel> _cafes = [];

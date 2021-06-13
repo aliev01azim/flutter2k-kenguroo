@@ -2,12 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:kenguroo/models/food_model.dart';
 import 'package:kenguroo/providers/cart.dart';
 import 'package:kenguroo/providers/food_categories.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:kenguroo/providers/kuhni_provider.dart';
-import 'package:kenguroo/providers/location_provider.dart';
 import 'package:kenguroo/providers/search_provider.dart';
 import 'package:kenguroo/providers/auth_provider.dart';
 import 'package:kenguroo/providers/user_provider.dart';
@@ -22,16 +21,21 @@ import 'package:kenguroo/screens/kuhnya_category_screen.dart';
 import 'package:kenguroo/screens/look_poiskovik_screen.dart';
 import 'package:kenguroo/screens/splash_screen.dart';
 import 'package:kenguroo/screens/addingCafe.dart';
-import 'package:kenguroo/screens/test.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
+import 'models/cafe_model.dart';
 import 'screens/account_subScreens.dart/about_app_screen.dart';
 import 'screens/addingFood.dart';
-import 'screens/location_screen.dart';
 import 'widgets/bottom_NavBar.dart';
 
 void main() async {
-  await Hive.initFlutter();
+  WidgetsFlutterBinding.ensureInitialized();
+  final document = await getApplicationDocumentsDirectory();
+  Hive
+    ..init(document.path)
+    ..registerAdapter(CafeModelAdapter())
+    ..registerAdapter(FoodModelAdapter());
   runApp(MyApp());
 }
 
@@ -55,11 +59,7 @@ class MyApp extends StatelessWidget {
           future: Firebase.initializeApp(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
+              return Text('no data');
             }
             if (snapshot.connectionState == ConnectionState.done) {
               return StreamBuilder(
@@ -67,7 +67,6 @@ class MyApp extends StatelessWidget {
                 builder: (ctx, userSnapshot) {
                   if (userSnapshot.hasData) {
                     return BottomNavBar();
-                    // return MapScreen();
                   } else if (userSnapshot.hasError) {
                     return Text(userSnapshot.error);
                   } else if (userSnapshot.connectionState ==

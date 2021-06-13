@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:kenguroo/models/cafe_model.dart';
 import 'package:kenguroo/providers/cafe-categories.dart';
 import 'package:kenguroo/screens/addingFood.dart';
 import 'package:kenguroo/widgets/kuhni.dart';
@@ -229,6 +230,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                             if (value.isEmpty) {
                               return 'Please enter your last time.';
                             }
+                            return null;
                           },
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.next,
@@ -259,6 +261,7 @@ class _AddingCafeScreenState extends State<AddingCafeScreen> {
                             if (value.isEmpty) {
                               return 'Please enter your last time.';
                             }
+                            return null;
                           },
                           focusNode: _discountFocus,
                           onSaved: (newValue) {

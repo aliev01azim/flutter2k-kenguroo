@@ -3,54 +3,9 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart';
-
-class FoodModel with ChangeNotifier {
-  String cafeId;
-  String cafeTitle;
-  String id;
-  int quantity;
-  String title;
-  String imageUrl;
-  String time; /*description*/
-  int discount; /*price*/
-  bool isFavorite;
-  int cafeDostavkaTime;
-  int cafeSkidka;
-  FoodModel({
-    this.cafeId,
-    this.cafeDostavkaTime,
-    this.cafeSkidka,
-    this.quantity,
-    this.cafeTitle,
-    @required this.id,
-    this.time,
-    @required this.title,
-    this.imageUrl,
-    @required this.discount,
-    this.isFavorite = false,
-  });
-  void setFavValue(bool newVal) {
-    isFavorite = newVal;
-    notifyListeners();
-  }
-
-  Future<void> toggleFavoriteStatus(String userId) async {
-    final favValue = isFavorite;
-    try {
-      final url = Uri.parse(
-          'https://kenguroo-14a75-default-rtdb.firebaseio.com/foodFavorites/$userId/$id.json');
-      final response = await put(url, body: json.encode(!isFavorite));
-      isFavorite = !isFavorite;
-      if (response.statusCode >= 400) {
-        setFavValue(favValue);
-      }
-      notifyListeners();
-    } catch (e) {
-      setFavValue(favValue);
-    }
-  }
-}
+import 'package:kenguroo/models/food_model.dart';
 
 class FoodCategories with ChangeNotifier {
   List<FoodModel> _foods = [];
@@ -68,6 +23,8 @@ class FoodCategories with ChangeNotifier {
 
   Future<void> fetchAndSetFoods(BuildContext context, String cafeId) async {
     final userId = FirebaseAuth.instance.currentUser.uid;
+    final box = await Hive.openBox('food-categories');
+
     var url = Uri.parse(
         'https://kenguroo-14a75-default-rtdb.firebaseio.com/cafes/$cafeId/foods.json');
     try {
@@ -98,7 +55,8 @@ class FoodCategories with ChangeNotifier {
             imageUrl: prodData['imageUrl'],
             discount: prodData['discount']));
       });
-      _foods = loadedProducts;
+      box.put('data', loadedProducts);
+      _foods = box.get('data');
       notifyListeners();
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
